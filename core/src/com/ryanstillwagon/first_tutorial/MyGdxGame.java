@@ -13,13 +13,22 @@ import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
-
+/*
+	Map size: 		640 x 480
+	Character Size:	32px
+	Grid layout: 20 x 15
+*/
 public class MyGdxGame extends ApplicationAdapter {
 	private SpriteBatch batch;
 	private Sprite playerCharacter;
+	private Sprite breakableWallSprite;
 	private int spriteSize = 64;
+	private int gridBoxNumber = 233;
 
 	private Texture playerTexture;
+	private Texture breakableWallTexture;
+
+	private boolean[] breakWallLocations;
 
 	private TiledMap level;
 	private TiledMapRenderer levelRenderer;
@@ -35,7 +44,6 @@ public class MyGdxGame extends ApplicationAdapter {
 	private float time;
 	private String timeDisplay;
 
-
 	private OrthographicCamera camera;
 
 
@@ -45,12 +53,17 @@ public class MyGdxGame extends ApplicationAdapter {
 	private void loadTextures(){
 		level = new TmxMapLoader().load("images/sample_background.tmx");
 		playerTexture = new Texture("images/placeholder_character.png");
+		breakableWallTexture = new Texture("images/placeholder_enemy.png");
 
 		levelRenderer = new OrthogonalTiledMapRenderer(level);
 		playerCharacter = new Sprite(playerTexture);
+		breakableWallSprite = new Sprite(breakableWallTexture);
 	}
-	private void loadAnimations() {
+	private void loadMap() {
 
+		for(int i = 0; i < breakWallLocations.length; i++){
+
+		}
 	}
 	private void loadFont(){
 		font = new BitmapFont();
@@ -61,6 +74,14 @@ public class MyGdxGame extends ApplicationAdapter {
 		camera.update();
 		levelRenderer.setView(camera);
 		levelRenderer.render();
+		renderBreakableWalls();
+
+
+	}
+	private void renderBreakableWalls(){
+
+
+
 
 	}
 	private void renderPlayerCharacter(){
@@ -109,13 +130,14 @@ public class MyGdxGame extends ApplicationAdapter {
 		else{
 			timeDisplay = "Time's Up!";
 		}
-		font.draw(batch, timeDisplay, 580,465);
+		font.draw(batch, timeDisplay, 560,465);
 	}
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-
+		breakWallLocations = new boolean[gridBoxNumber];
+;
 		winWidth = Gdx.graphics.getWidth();
 		winHeight = Gdx.graphics.getHeight();
 		camera = new OrthographicCamera();
@@ -123,7 +145,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		camera.update();
 
 		loadTextures();
-		//loadAnimations();
+		loadMap();
 		loadFont();
 		xPosPlayer = 32;
 		yPosPlayer = 32;
