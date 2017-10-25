@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-up" width="20" height="15" tilewidth="32" tileheight="32" nextobjectid="1">
+ <tileset firstgid="1" name="level tiles" tilewidth="32" tileheight="32" tilecount="224">
+  <image source="walls1.png" width="448" height="512"/>
+ </tileset>
+ <layer name="Base" width="20" height="15">
+  <data encoding="base64" compression="zlib">
+   eJyFk80KwzAMg7vuJ8eWQY7tCjmmG+T9X24uKCCETQ4faWVHsU1SpmkqIA3IYJR38THuwsN4Gi/joHNzgJ6baY8yGw2wrvUn6Dd8H07d17qK3r2j/hfEdql3QVz1aLadDXWe0s+GfNVHc6rImaWfinyeX3M8mtD7XbGyXqBzvnqob+93d/ptju55NJpnxf8p8Uj34PvzNd7GT+pgnWcWefJ9ysGZ3twT+bMHf3tvWP31DrLG52hs9P4SeXjvL9ofzSkH8T9PFCFj
+  </data>
+ </layer>
+ <layer name="Destructable Walls" width="20" height="15">
+  <data encoding="base64" compression="zlib">
+   eJxjYCAM2JEwsYAdDxaFYlLME8WDlclwnzIejOxOYoEhA2E/K5NoHiE/G5JoHj4/k2IWzDx8mNT4IORfGCbFPHz+hWFSzCMGjwLaAgAd1ws3
+  </data>
+ </layer>
+ <layer name="Boundary Walls" width="20" height="15">
+  <data encoding="base64" compression="zlib">
+   eJxTY2Bg4AJibiSaB4h5yeCrAzEHA/WAOBCLUdE8TiBWoaJ5IPcZUdE8VQbqhp8xw2j4UQJGYvhR07+g8DMBYgkglkSipYBYmgy+KRADAMWpBj4=
+  </data>
+ </layer>
+</map>
