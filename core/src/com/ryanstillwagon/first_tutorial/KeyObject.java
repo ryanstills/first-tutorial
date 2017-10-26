@@ -2,13 +2,12 @@ package com.ryanstillwagon.first_tutorial;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
-public class BreakableWall extends MapContents {
-
+public class KeyObject extends MapContents {
     private int xPos;
     private int yPos;
     private Sprite sprite;
 
-    public BreakableWall(int xPos, int yPos, Sprite wallSprite){
+    public KeyObject(int xPos, int yPos, Sprite wallSprite){
         this.xPos = xPos;
         this.yPos = yPos;
         this.sprite = wallSprite;

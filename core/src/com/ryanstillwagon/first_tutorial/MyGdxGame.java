@@ -13,6 +13,9 @@ import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
+import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
+
 /*
 	Map size: 		640 x 480
 	Character Size:	32px
@@ -21,14 +24,17 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 public class MyGdxGame extends ApplicationAdapter {
 	private SpriteBatch batch;
 	private Sprite playerCharacter;
-	private Sprite breakableWallSprite;
-	private int spriteSize = 64;
-	private int gridBoxNumber = 233;
+	private Sprite keySprite;
+	private static Sprite breakableWallSprite;
+
+	private OrthographicCamera camera;
 
 	private Texture playerTexture;
 	private Texture breakableWallTexture;
+	private Texture keyTexture;
 
-	private boolean[] breakWallLocations;
+	private int[] mapContentsLocations;
+	private ArrayList<MapContents> mapContentsLayout;
 
 	private TiledMap level;
 	private TiledMapRenderer levelRenderer;
@@ -37,62 +43,84 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	private static float xPosPlayer;
 	private static float yPosPlayer;
-
+	private int spriteSize = 64;
+	private int gridBoxNumber = 233;
 	private int winWidth;
 	private int winHeight;
-
-	private float time;
+	private float gameTime;
+	private float movementTime;
 	private String timeDisplay;
-
-	private OrthographicCamera camera;
-
-
-
-	private static final float moveUnit = 275.0f;  //increase to 30?
+	private static final float moveUnit = 32.0f;  //increase to 300?
 
 	private void loadTextures(){
 		level = new TmxMapLoader().load("images/sample_background.tmx");
 		playerTexture = new Texture("images/placeholder_character.png");
-		breakableWallTexture = new Texture("images/placeholder_enemy.png");
+		breakableWallTexture = new Texture("images/breakable_wall_green.png");
+		keyTexture = new Texture("images/key.png");
 
 		levelRenderer = new OrthogonalTiledMapRenderer(level);
 		playerCharacter = new Sprite(playerTexture);
 		breakableWallSprite = new Sprite(breakableWallTexture);
+		keySprite = new Sprite(keyTexture);
 	}
 	private void loadMap() {
+		int xPos = 32;
+		int yPos = 32;
+		int positionCount = 0;
+		int keyCount = 5;
+		for(int i = 0; i < gridBoxNumber; i++){
+			mapContentsLocations[i] = ThreadLocalRandom.current().nextInt(0,10);
+		}
+		for(int i = 0; i < mapContentsLocations.length; i++){
+			if(mapContentsLocations[i] <= 3){
+				MapContents temp = MapContents.getContent(xPos, yPos, breakableWallSprite, 1);
+				mapContentsLayout.add(temp);
+			}
+			if(mapContentsLocations[i] == 5 && keyCount > 0){
+				MapContents temp = MapContents.getContent(xPos, yPos, keySprite, 2);
+				mapContentsLayout.add(temp);
+				keyCount--;
+			}
 
-		for(int i = 0; i < breakWallLocations.length; i++){
-
+			if(positionCount < 17){
+				xPos += 32;
+				positionCount++;
+			}
+			else{
+				xPos = 32;
+				yPos += 32;
+				positionCount = 0;
+			}
 		}
 	}
 	private void loadFont(){
 		font = new BitmapFont();
 		font.setColor(Color.YELLOW);
 	}
-
 	private void renderLevel(){
 		camera.update();
 		levelRenderer.setView(camera);
 		levelRenderer.render();
-		renderBreakableWalls();
-
-
 	}
 	private void renderBreakableWalls(){
 
-
-
-
+		for(int i = 0; i < mapContentsLayout.size(); i++){
+			batch.draw(mapContentsLayout.get(i).getSprite(),
+					   mapContentsLayout.get(i).getXPos(),
+					   mapContentsLayout.get(i).getYPos());
+		}
 	}
-	private void renderPlayerCharacter(){
-
-		float elapsedTime = Gdx.graphics.getDeltaTime();
+	private void renderPlayerCharacter(float elapsedTime){
+		movementTime += elapsedTime;
 		if(Gdx.input.isKeyPressed(Input.Keys.W)){
 			if(yPosPlayer >= winHeight - spriteSize){
 				yPosPlayer = winHeight - spriteSize;
 			}
 			else {
-				yPosPlayer += (moveUnit * elapsedTime);
+				if(movementTime > 0.15f) {
+					yPosPlayer += moveUnit;
+					movementTime = 0;
+				}
 			}
 		}
 		else if(Gdx.input.isKeyPressed(Input.Keys.S)){
@@ -100,7 +128,10 @@ public class MyGdxGame extends ApplicationAdapter {
 				yPosPlayer = 32;
 			}
 			else{
-				yPosPlayer -= (moveUnit * elapsedTime);
+				if(movementTime > 0.15f) {
+					yPosPlayer -= moveUnit;
+					movementTime = 0;
+				}
 			}
 		}
 		else if(Gdx.input.isKeyPressed(Input.Keys.D)){
@@ -108,7 +139,10 @@ public class MyGdxGame extends ApplicationAdapter {
 				xPosPlayer = winWidth - spriteSize;
 			}
 			else{
-				xPosPlayer += (moveUnit * elapsedTime);
+				if(movementTime > 0.15f) {
+					xPosPlayer += moveUnit;
+					movementTime = 0;
+				}
 			}
 		}
 		else if(Gdx.input.isKeyPressed(Input.Keys.A)){
@@ -116,16 +150,19 @@ public class MyGdxGame extends ApplicationAdapter {
 				xPosPlayer = 32;
 			}
 			else{
-				xPosPlayer -= (moveUnit * elapsedTime);
+				if(movementTime > 0.15f) {
+					xPosPlayer -= moveUnit;
+					movementTime = 0;
+				}
 			}
 		}
 		playerCharacter.setPosition(xPosPlayer,yPosPlayer);
 		playerCharacter.draw(batch);
 	}
-	private void renderTime(){
-		time -= Gdx.graphics.getDeltaTime();
-		if(time > 0) {
-			timeDisplay = Float.toString(time);
+	private void renderTime(float elapsedTime){
+		gameTime -= elapsedTime;
+		if(gameTime > 0) {
+			timeDisplay = Float.toString(gameTime);
 		}
 		else{
 			timeDisplay = "Time's Up!";
@@ -136,8 +173,9 @@ public class MyGdxGame extends ApplicationAdapter {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		breakWallLocations = new boolean[gridBoxNumber];
-;
+		mapContentsLocations = new int[gridBoxNumber];
+		mapContentsLayout = new ArrayList<MapContents>();
+
 		winWidth = Gdx.graphics.getWidth();
 		winHeight = Gdx.graphics.getHeight();
 		camera = new OrthographicCamera();
@@ -149,7 +187,8 @@ public class MyGdxGame extends ApplicationAdapter {
 		loadFont();
 		xPosPlayer = 32;
 		yPosPlayer = 32;
-		time = 99;
+		gameTime = 99;
+		movementTime = 0;
 	}
 
 	@Override
@@ -157,14 +196,17 @@ public class MyGdxGame extends ApplicationAdapter {
 		Gdx.gl.glClearColor(1, 0, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+		float elapsedTime = Gdx.graphics.getDeltaTime();
+
 		renderLevel();
 
 		batch.begin();
-			renderPlayerCharacter();
-			renderTime();
+			renderBreakableWalls();
+			renderPlayerCharacter(elapsedTime);
+			renderTime(elapsedTime);
 		batch.end();
 	}
-	
+
 	@Override
 	public void dispose () {
 		batch.dispose();
