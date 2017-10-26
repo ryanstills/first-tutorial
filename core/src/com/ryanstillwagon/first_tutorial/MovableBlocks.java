@@ -2,12 +2,13 @@ package com.ryanstillwagon.first_tutorial;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
-public class KeyObject extends MapContents {
+public class MovableBlocks extends MapContents {
+
     private int xPos;
     private int yPos;
     private Sprite sprite;
 
-    public KeyObject(int xPos, int yPos, Sprite wallSprite){
+    public MovableBlocks(int xPos, int yPos, Sprite wallSprite){
         this.xPos = xPos;
         this.yPos = yPos;
         this.sprite = wallSprite;

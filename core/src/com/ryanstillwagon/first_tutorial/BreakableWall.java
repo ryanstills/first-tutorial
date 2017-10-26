@@ -20,5 +20,7 @@ public class BreakableWall extends MapContents {
     public int getYPos(){
         return yPos;
     }
-    public Sprite getSprite(){return sprite;}
+    public Sprite getSprite(){
+        return sprite;
+    }
 }

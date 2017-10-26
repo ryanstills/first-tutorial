@@ -50,6 +50,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	private float gameTime;
 	private float movementTime;
 	private String timeDisplay;
+	private int keyCountDisplay;
 	private static final float moveUnit = 32.0f;  //increase to 300?
 
 	private void loadTextures(){
@@ -169,6 +170,9 @@ public class MyGdxGame extends ApplicationAdapter {
 		}
 		font.draw(batch, timeDisplay, 560,465);
 	}
+	private void renderKeyCount(){
+		font.draw(batch, Integer.toString(keyCountDisplay) + " keys left", 32, 465);
+	}
 
 	@Override
 	public void create () {
@@ -189,6 +193,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		yPosPlayer = 32;
 		gameTime = 99;
 		movementTime = 0;
+		keyCountDisplay = 5;
 	}
 
 	@Override
@@ -204,6 +209,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			renderBreakableWalls();
 			renderPlayerCharacter(elapsedTime);
 			renderTime(elapsedTime);
+			renderKeyCount();
 		batch.end();
 	}
 
