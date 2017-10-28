@@ -16,31 +16,27 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static com.ryanstillwagon.first_tutorial.MapContents.mapContentsPositions;
+
 /*
 	Map size: 		640 x 480
 	Character Size:	32px
-	Grid layout: 20 x 15
+	Grid layout: 18 x 13
 */
 public class MyGdxGame extends ApplicationAdapter {
 	private SpriteBatch batch;
 	private Sprite playerCharacter;
 	private Sprite keySprite;
 	private static Sprite breakableWallSprite;
-
 	private OrthographicCamera camera;
-
 	private Texture playerTexture;
 	private Texture breakableWallTexture;
 	private Texture keyTexture;
-
-	private int[] mapContentsLocations;
-	private ArrayList<MapContents> mapContentsLayout;
-
+	private int[] breakableWallLocations;
+	private ArrayList<MapContents> breakableWallLayout;
 	private TiledMap level;
 	private TiledMapRenderer levelRenderer;
-
 	private BitmapFont font;
-
 	private static float xPosPlayer;
 	private static float yPosPlayer;
 	private int spriteSize = 64;
@@ -50,7 +46,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	private float gameTime;
 	private float movementTime;
 	private String timeDisplay;
-	private int keyCountDisplay;
+	private int keyCount;
 	private static final float moveUnit = 32.0f;  //increase to 300?
 
 	private void loadTextures(){
@@ -65,22 +61,23 @@ public class MyGdxGame extends ApplicationAdapter {
 		keySprite = new Sprite(keyTexture);
 	}
 	private void loadMap() {
+		loadWalls();
+	}
+	private void loadFont(){
+		font = new BitmapFont();
+		font.setColor(Color.YELLOW);
+	}
+	private void loadWalls(){
 		int xPos = 32;
 		int yPos = 32;
 		int positionCount = 0;
-		int keyCount = 5;
 		for(int i = 0; i < gridBoxNumber; i++){
-			mapContentsLocations[i] = ThreadLocalRandom.current().nextInt(0,10);
+			breakableWallLocations[i] = ThreadLocalRandom.current().nextInt(0,10);
 		}
-		for(int i = 0; i < mapContentsLocations.length; i++){
-			if(mapContentsLocations[i] <= 3){
+		for(int i = 0; i < breakableWallLocations.length; i++){
+			if(breakableWallLocations[i] <= 3){
 				MapContents temp = MapContents.getContent(xPos, yPos, breakableWallSprite, 1);
-				mapContentsLayout.add(temp);
-			}
-			if(mapContentsLocations[i] == 5 && keyCount > 0){
-				MapContents temp = MapContents.getContent(xPos, yPos, keySprite, 2);
-				mapContentsLayout.add(temp);
-				keyCount--;
+				breakableWallLayout.add(temp);
 			}
 
 			if(positionCount < 17){
@@ -94,10 +91,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			}
 		}
 	}
-	private void loadFont(){
-		font = new BitmapFont();
-		font.setColor(Color.YELLOW);
-	}
+
 	private void renderLevel(){
 		camera.update();
 		levelRenderer.setView(camera);
@@ -105,17 +99,24 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 	private void renderBreakableWalls(){
 
-		for(int i = 0; i < mapContentsLayout.size(); i++){
-			batch.draw(mapContentsLayout.get(i).getSprite(),
-					   mapContentsLayout.get(i).getXPos(),
-					   mapContentsLayout.get(i).getYPos());
+		for(int i = 0; i < breakableWallLayout.size(); i++){
+			batch.draw(breakableWallLayout.get(i).getSprite(),
+					   breakableWallLayout.get(i).getXPos(),
+					   breakableWallLayout.get(i).getYPos());
 		}
 	}
 	private void renderPlayerCharacter(float elapsedTime){
 		movementTime += elapsedTime;
+		String positionKey;
 		if(Gdx.input.isKeyPressed(Input.Keys.W)){
+			positionKey = stringify((int)(xPosPlayer),(int)(yPosPlayer + 32));
 			if(yPosPlayer >= winHeight - spriteSize){
-				yPosPlayer = winHeight - spriteSize;
+				yPosPlayer += 0;
+			}
+			// If there is a breakable block do not move
+			else if(mapContentsPositions.containsKey(positionKey) &&
+					mapContentsPositions.get(positionKey).getContentsKey() == 1){
+				yPosPlayer += 0;
 			}
 			else {
 				if(movementTime > 0.15f) {
@@ -125,8 +126,14 @@ public class MyGdxGame extends ApplicationAdapter {
 			}
 		}
 		else if(Gdx.input.isKeyPressed(Input.Keys.S)){
+			positionKey = stringify((int)(xPosPlayer),(int)(yPosPlayer - 32));
 			if(yPosPlayer <= 32){
 				yPosPlayer = 32;
+			}
+			// If there is a breakable block do not move
+			else if(mapContentsPositions.containsKey(positionKey) &&
+					mapContentsPositions.get(positionKey).getContentsKey() == 1){
+				yPosPlayer += 0;
 			}
 			else{
 				if(movementTime > 0.15f) {
@@ -136,8 +143,14 @@ public class MyGdxGame extends ApplicationAdapter {
 			}
 		}
 		else if(Gdx.input.isKeyPressed(Input.Keys.D)){
+			positionKey = stringify((int)(xPosPlayer + 32),(int)(yPosPlayer));
 			if(xPosPlayer >= winWidth - spriteSize){
 				xPosPlayer = winWidth - spriteSize;
+			}
+			// If there is a breakable block do not move
+			else if(mapContentsPositions.containsKey(positionKey) &&
+					mapContentsPositions.get(positionKey).getContentsKey() == 1){
+				xPosPlayer += 0;
 			}
 			else{
 				if(movementTime > 0.15f) {
@@ -147,8 +160,14 @@ public class MyGdxGame extends ApplicationAdapter {
 			}
 		}
 		else if(Gdx.input.isKeyPressed(Input.Keys.A)){
+			positionKey = stringify((int)(xPosPlayer - 32),(int)(yPosPlayer ));
 			if(xPosPlayer <= 32){
 				xPosPlayer = 32;
+			}
+			// If there is a breakable block do not move
+			else if(mapContentsPositions.containsKey(positionKey) &&
+					mapContentsPositions.get(positionKey).getContentsKey() == 1){
+				xPosPlayer += 0;
 			}
 			else{
 				if(movementTime > 0.15f) {
@@ -171,14 +190,14 @@ public class MyGdxGame extends ApplicationAdapter {
 		font.draw(batch, timeDisplay, 560,465);
 	}
 	private void renderKeyCount(){
-		font.draw(batch, Integer.toString(keyCountDisplay) + " keys left", 32, 465);
+		font.draw(batch, Integer.toString(keyCount) + " keys left", 32, 465);
 	}
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		mapContentsLocations = new int[gridBoxNumber];
-		mapContentsLayout = new ArrayList<MapContents>();
+		breakableWallLocations = new int[gridBoxNumber];
+		breakableWallLayout = new ArrayList<MapContents>();
 
 		winWidth = Gdx.graphics.getWidth();
 		winHeight = Gdx.graphics.getHeight();
@@ -189,11 +208,12 @@ public class MyGdxGame extends ApplicationAdapter {
 		loadTextures();
 		loadMap();
 		loadFont();
+
 		xPosPlayer = 32;
 		yPosPlayer = 32;
 		gameTime = 99;
 		movementTime = 0;
-		keyCountDisplay = 5;
+		keyCount = 5;
 	}
 
 	@Override
@@ -217,7 +237,13 @@ public class MyGdxGame extends ApplicationAdapter {
 	public void dispose () {
 		batch.dispose();
 		playerTexture.dispose();
+		breakableWallTexture.dispose();
+		keyTexture.dispose();
 		level.dispose();
 		font.dispose();
+	}
+
+	private String stringify(int xPos, int yPos){
+		return ( Integer.toString(xPos) + Integer.toString(yPos) );
 	}
 }
