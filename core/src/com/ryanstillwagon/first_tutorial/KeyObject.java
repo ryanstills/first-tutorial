@@ -8,10 +8,10 @@ public class KeyObject extends MapContents {
     private int yPos;
     private Sprite sprite;
 
-    public KeyObject(int xPos, int yPos, Sprite wallSprite){
+    public KeyObject(int xPos, int yPos, Sprite keySprite){
         this.xPos = xPos;
         this.yPos = yPos;
-        this.sprite = wallSprite;
+        this.sprite = keySprite;
         contentsKey = 2;
         mapContentsPositions.put(stringify(xPos,yPos), this);
     }

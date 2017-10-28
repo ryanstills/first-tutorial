@@ -4,9 +4,9 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 
 public class MovableBlocks extends MapContents {
 
-    private int xPos;
-    private int yPos;
-    private Sprite sprite;
+    protected int xPos;
+    protected int yPos;
+    protected Sprite sprite;
 
     public MovableBlocks(int xPos, int yPos, Sprite wallSprite){
         this.xPos = xPos;
@@ -27,11 +27,30 @@ public class MovableBlocks extends MapContents {
         return sprite;
     }
 
-    public void setXPos(int xPos){this.xPos = xPos;}
-    public void setYPos(int yPos){this.yPos = yPos;}
+    public void setXPos(int newXPos){
+        mapContentsPositions.remove(stringify(xPos, yPos));
+        this.xPos += newXPos;
+        mapContentsPositions.put(stringify(xPos, yPos), this);
+        checkForBreakableBlock(stringify(xPos, (yPos)));
+    }
+    public void setYPos(int newYPos){
+        mapContentsPositions.remove(stringify(xPos,yPos));
+        this.yPos += newYPos;
+        mapContentsPositions.put(stringify(xPos,yPos), this);
+        checkForBreakableBlock(stringify(xPos, (yPos)));
+
+    }
     public void setSprite(Sprite sprite){this.sprite = sprite;}
 
     public String stringify(int xPos, int yPos){
         return ( Integer.toString(xPos) + Integer.toString(yPos) );
+    }
+
+    private void checkForBreakableBlock(String positionKey){
+        if(mapContentsPositions.containsKey(positionKey) &&
+           mapContentsPositions.get(positionKey).getContentsKey() == 1){
+
+            mapContentsPositions.remove(positionKey);
+        }
     }
 }
