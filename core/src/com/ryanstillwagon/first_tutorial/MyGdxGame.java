@@ -3,6 +3,7 @@ package com.ryanstillwagon.first_tutorial;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -14,9 +15,6 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 import static com.ryanstillwagon.first_tutorial.MapContents.mapContentsPositions;
 
@@ -24,74 +22,110 @@ import static com.ryanstillwagon.first_tutorial.MapContents.mapContentsPositions
 	Map size: 		640 x 480
 	Character Size:	32px
 	Grid layout: 18 x 13
+
+Contents Key:
+1 - breakable wall
+2 - key object
+3 - all direction movable block
+4 - down only movable block
+5 - up only movable block
+6 - left only movable block
+7 - right only movable block
+8 - traps (not in use yet)
+9 - player character
+10 - enemy character (not in use yet)
 */
 public class MyGdxGame extends ApplicationAdapter {
 	private SpriteBatch batch;
 	private Sprite playerCharacter;
-	private static Sprite keySprite;
-	private Sprite breakableWallSprite;
-	private Sprite moveableBlockSprite;
 	private OrthographicCamera camera;
 	private Texture playerTexture;
 	private Texture breakableWallTexture;
 	private Texture keyTexture;
-	private Texture moveableBlockTexture;
-	private int[] breakableWallLocations;
-	private static ArrayList<MapContents> breakableWallLayout;
+	private Texture masterKeyTexture;
+	private Texture exitDoorTexture;
+	private Texture movableBlockAllTexture;
+	private Texture movableBlockUpTexture;
+	private Texture movableBlockDownTexture;
+	private Texture movableBlockLeftTexture;
+	private Texture movableBlockRightTexture;
+	private Texture[] contentsTextures;
+	private int[] mapContentsLocations;
+	private static ArrayList<MapContents> levelLayout;
 	private TiledMap level;
 	private TiledMapRenderer levelRenderer;
 	private BitmapFont font;
 	private static float xPosPlayer;
 	private static float yPosPlayer;
 	private int spriteSize = 64;
-	private int gridBoxNumber = 233;
 	private int winWidth;
 	private int winHeight;
 	private float gameTime;
 	private float movementTime;
 	private String timeDisplay;
 	private int keyCount;
-	private static final float moveUnit = 32.0f;  //increase to 300?
+	private static final float moveUnit = 32.0f;
 
 	private KeyObject keyOne;
 	private String keyString;
-	private BlockAllDirections testBlock;
+	private boolean masterKeySpawned;
+	private boolean exitDoorSpawned;
+
+	private int[] map = {2,1,0,0,0,0,0,0,0,0,1,0,1,1,1,1,2,1,
+						 0,1,0,0,3,1,0,1,0,1,0,0,0,0,0,1,1,1,
+						 0,1,1,0,0,0,1,0,0,0,0,3,1,0,1,0,0,1,
+						 0,0,0,1,0,0,0,0,0,0,1,0,0,0,1,1,0,0,
+						 1,1,1,1,0,3,0,4,0,1,1,1,0,1,0,0,1,0,
+						 0,0,1,2,1,0,0,0,0,1,2,1,0,1,0,3,0,0,
+						 1,0,1,1,1,0,0,0,0,1,1,1,0,0,0,9,0,0,
+						 0,0,1,0,0,1,0,1,0,1,0,0,1,0,0,0,0,1,
+						 1,1,0,1,2,1,0,0,0,0,0,1,1,0,1,1,0,1,
+						 1,1,0,0,0,1,0,1,0,1,0,1,0,0,0,3,0,0};
+
+	//FileHandle readFile = Gdx.files.local("test_level.txt");
+
+
+
 
 	private void loadTextures(){
 		level = new TmxMapLoader().load("images/sample_background.tmx");
 		playerTexture = new Texture("images/placeholder_character.png");
 		breakableWallTexture = new Texture("images/breakable_wall_green.png");
 		keyTexture = new Texture("images/key.png");
-		moveableBlockTexture = new Texture("images/block_any_direction.png");
+		masterKeyTexture = new Texture("images/master_key.png");
+		exitDoorTexture = new Texture("images/castledoors.png");
+
+		movableBlockAllTexture = new Texture("images/block_any_direction.png");
+		movableBlockUpTexture = new Texture("images/block_only_up.png");
+		movableBlockDownTexture = new Texture("images/block_only_down.png");
+		movableBlockLeftTexture = new Texture("images/block_only_left.png");
+		movableBlockRightTexture = new Texture("images/block_only_right.png");
 
 		levelRenderer = new OrthogonalTiledMapRenderer(level);
 		playerCharacter = new Sprite(playerTexture);
-		breakableWallSprite = new Sprite(breakableWallTexture);
-		keySprite = new Sprite(keyTexture);
-		moveableBlockSprite = new Sprite(moveableBlockTexture);
+
+		contentsTextures[1] = breakableWallTexture;
+		contentsTextures[2] = keyTexture;
+		contentsTextures[3] = movableBlockAllTexture;
+		contentsTextures[4] = movableBlockDownTexture;
+		contentsTextures[5] = movableBlockUpTexture;
+		contentsTextures[6] = movableBlockLeftTexture;
+		contentsTextures[7] = movableBlockRightTexture;
+		contentsTextures[9] = playerTexture;
 	}
 	private void loadMap() {
-		loadWalls();
-		loadMoveableBlocks();
-		loadKeys();
-
-	}
-	private void loadFont(){
-		font = new BitmapFont();
-		font.setColor(Color.YELLOW);
-	}
-	private void loadWalls(){
 		int xPos = 32;
 		int yPos = 32;
 		int positionCount = 0;
-		for(int i = 0; i < gridBoxNumber; i++){
-			breakableWallLocations[i] = ThreadLocalRandom.current().nextInt(0,10);
+
+		for(int i = 0; i < map.length; i++){
+			mapContentsLocations[i] = map[i];
 		}
-		for(int i = 0; i < breakableWallLocations.length; i++){
-			if(breakableWallLocations[i] <= 3){
-				MapContents temp = MapContents.getContent(xPos, yPos, breakableWallSprite, 1);
-				breakableWallLayout.add(temp);
-			}
+		for(int i = 0; i < mapContentsLocations.length; i++){
+
+			MapContents temp = MapContents.getContent(xPos, yPos, contentsTextures, mapContentsLocations[i]);
+			levelLayout.add(temp);
+
 			if(positionCount < 17){
 				xPos += 32;
 				positionCount++;
@@ -103,15 +137,9 @@ public class MyGdxGame extends ApplicationAdapter {
 			}
 		}
 	}
-	private void loadMoveableBlocks(){
-		testBlock = new BlockAllDirections(128, 128, moveableBlockSprite);
-		keyString = stringify(testBlock.getXPos(), testBlock.getYPos());
-		mapContentsPositions.put(keyString, testBlock);
-	}
-	private void loadKeys(){
-		keyOne = new KeyObject(96,96, keySprite);
-		keyString = stringify(keyOne.getXPos(),keyOne.getYPos());
-		mapContentsPositions.put(keyString, keyOne);
+	private void loadFont(){
+		font = new BitmapFont();
+		font.setColor(Color.YELLOW);
 	}
 
 	private void renderLevel(){
@@ -148,15 +176,22 @@ public class MyGdxGame extends ApplicationAdapter {
 					keyCount--;
 				}
 			}
-			//checks for moveable blocks
+			//checks for an block that can be moved in all directions or up only
 			else if(mapContentsPositions.containsKey(positionKey) &&
-					mapContentsPositions.get(positionKey).getContentsKey() == 3){
+					(mapContentsPositions.get(positionKey).getContentsKey() == 3 ||
+					 mapContentsPositions.get(positionKey).getContentsKey() == 5)){
 
-				if(movementTime > 0.15f && yPosPlayer <= winHeight - (spriteSize * 2)){
+				if(movementTime > 0.15f && yPosPlayer <= winHeight - (spriteSize * 2) &&
+						checkForMovableBlockCollision((int)xPosPlayer, (int)yPosPlayer, 0)){
 					yPosPlayer += moveUnit;
 					movementTime = 0;
 					mapContentsPositions.get(positionKey).setYPos(32);
 				}
+			}
+			else if(mapContentsPositions.containsKey(positionKey) &&
+					mapContentsPositions.get(positionKey).getContentsKey() != 5){
+
+				yPosPlayer += 0;
 			}
 			else {
 				if(movementTime > 0.15f) {
@@ -185,14 +220,21 @@ public class MyGdxGame extends ApplicationAdapter {
 					keyCount--;
 				}
 			}
-			// Checks for moveable block
+			// Checks for a block that can be move in all directions or down
 			else if(mapContentsPositions.containsKey(positionKey) &&
-					mapContentsPositions.get(positionKey).getContentsKey() == 3){
-				if(movementTime > 0.15f && yPosPlayer > 64) {
+					(mapContentsPositions.get(positionKey).getContentsKey() == 3 ||
+					 mapContentsPositions.get(positionKey).getContentsKey() == 4)){
+				if(movementTime > 0.15f && yPosPlayer > 64 &&
+						checkForMovableBlockCollision((int)xPosPlayer,(int)yPosPlayer, 1)) {
 					yPosPlayer -= moveUnit;
 					movementTime = 0;
 					mapContentsPositions.get(positionKey).setYPos(-32);
 				}
+			}
+			else if(mapContentsPositions.containsKey(positionKey) &&
+					mapContentsPositions.get(positionKey).getContentsKey() != 4){
+
+				yPosPlayer += 0;
 			}
 			else{
 				if(movementTime > 0.15f) {
@@ -221,15 +263,22 @@ public class MyGdxGame extends ApplicationAdapter {
 					keyCount--;
 				}
 			}
-			// if player moves into the space of a moveable block
+			// checks for a block that can be move in all directions or right
 			else if(mapContentsPositions.containsKey(positionKey) &&
-					mapContentsPositions.get(positionKey).getContentsKey() == 3){
-				if(movementTime > 0.15f && xPosPlayer <= winWidth - (spriteSize * 2)) {
+					(mapContentsPositions.get(positionKey).getContentsKey() == 3 ||
+					 mapContentsPositions.get(positionKey).getContentsKey() == 7)){
+				if(movementTime > 0.15f && xPosPlayer <= winWidth - (spriteSize * 2)&&
+						checkForMovableBlockCollision((int)xPosPlayer,(int)yPosPlayer, 2)) {
 
 					xPosPlayer += moveUnit;
 					movementTime = 0;
 					mapContentsPositions.get(positionKey).setXPos(32);
 				}
+			}
+			else if(mapContentsPositions.containsKey(positionKey) &&
+					mapContentsPositions.get(positionKey).getContentsKey() != 7){
+
+				xPosPlayer += 0;
 			}
 			else{
 				if(movementTime > 0.15f) {
@@ -257,14 +306,21 @@ public class MyGdxGame extends ApplicationAdapter {
 					keyCount--;
 				}
 			}
-			// if player moves into the space of a moveable block
+			//checks for a block that can be moved in all directions or left
 			else if(mapContentsPositions.containsKey(positionKey) &&
-					mapContentsPositions.get(positionKey).getContentsKey() == 3){
-				if(movementTime > 0.15f  && xPosPlayer > 64) {
+					(mapContentsPositions.get(positionKey).getContentsKey() == 3 ||
+					 mapContentsPositions.get(positionKey).getContentsKey() == 6)){
+				if(movementTime > 0.15f  && xPosPlayer > 64 &&
+						checkForMovableBlockCollision((int)xPosPlayer, (int) yPosPlayer, 3)) {
 					xPosPlayer -= moveUnit;
 					movementTime = 0;
 					mapContentsPositions.get(positionKey).setXPos(-32);
 				}
+			}
+			else if(mapContentsPositions.containsKey(positionKey) &&
+					mapContentsPositions.get(positionKey).getContentsKey() != 6){
+
+				xPosPlayer += 0;
 			}
 			else{
 				if(movementTime > 0.15f) {
@@ -287,14 +343,23 @@ public class MyGdxGame extends ApplicationAdapter {
 		font.draw(batch, timeDisplay, 560,465);
 	}
 	private void renderKeyCount(){
-		font.draw(batch, Integer.toString(keyCount) + " keys left", 32, 465);
+		if(keyCount > 0) {
+			font.draw(batch, Integer.toString(keyCount) + " keys left", 32, 465);
+		}
+		else if(keyCount == 0){
+			font.draw(batch, "Master key has spawned!" , 32, 465);
+		}
+		else{
+			font.draw(batch, "Door has spawned!", 32 , 465);
+		}
 	}
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		breakableWallLocations = new int[gridBoxNumber];
-		breakableWallLayout = new ArrayList<MapContents>();
+		levelLayout = new ArrayList<MapContents>();
+		contentsTextures = new Texture[11];
+		mapContentsLocations = new int[233];
 
 		winWidth = Gdx.graphics.getWidth();
 		winHeight = Gdx.graphics.getHeight();
@@ -306,13 +371,13 @@ public class MyGdxGame extends ApplicationAdapter {
 		loadMap();
 		loadFont();
 
-		xPosPlayer = 32;
-		yPosPlayer = 32;
+		xPosPlayer = 544;
+		yPosPlayer = 320;
 		gameTime = 99;
 		movementTime = 0;
 		keyCount = 5;
+		masterKeySpawned = false;
 	}
-
 	@Override
 	public void render () {
 		Gdx.gl.glClearColor(1, 0, 1, 1);
@@ -328,17 +393,55 @@ public class MyGdxGame extends ApplicationAdapter {
 			renderKeyCount();
 		batch.end();
 	}
-
 	@Override
 	public void dispose () {
 		batch.dispose();
-		playerTexture.dispose();
-		breakableWallTexture.dispose();
-		keyTexture.dispose();
+		for(int i = 0; i < contentsTextures.length; i++){
+			if(contentsTextures[i] != null) {
+				contentsTextures[i].dispose();
+			}
+		}
 		level.dispose();
 		font.dispose();
 	}
 
+	private boolean checkForMovableBlockCollision(int xPosPlayer, int yPosPlayer, int directionKey){
+		String positionKey;
+		//up
+		if(directionKey == 0){
+			positionKey = stringify(xPosPlayer, yPosPlayer + 64);
+			if(!mapContentsPositions.containsKey(positionKey))
+				return true;
+			return (mapContentsPositions.get(positionKey).getContentsKey() < 3 ||
+				    mapContentsPositions.get(positionKey).getContentsKey() > 7);
+		}
+		//down
+		else if(directionKey == 1){
+			positionKey = stringify(xPosPlayer, yPosPlayer - 64);
+			if(!mapContentsPositions.containsKey(positionKey))
+				return true;
+			return ((mapContentsPositions.get(positionKey).getContentsKey() < 3) ||
+					(mapContentsPositions.get(positionKey).getContentsKey() > 7));
+		}
+		//right
+		else if(directionKey == 2){
+			positionKey = stringify(xPosPlayer + 64, yPosPlayer);
+			if(!mapContentsPositions.containsKey(positionKey))
+				return true;
+			return ((mapContentsPositions.get(positionKey).getContentsKey() < 3) ||
+					(mapContentsPositions.get(positionKey).getContentsKey() > 7));
+
+		}
+		//left
+		else{
+			positionKey = stringify(xPosPlayer - 64, yPosPlayer);
+			if(!mapContentsPositions.containsKey(positionKey))
+				return true;
+			return ((mapContentsPositions.get(positionKey).getContentsKey() < 3) ||
+					(mapContentsPositions.get(positionKey).getContentsKey() > 7));
+
+		}
+	}
 	private String stringify(int xPos, int yPos){
 		return ( Integer.toString(xPos) + Integer.toString(yPos) );
 	}

@@ -1,10 +1,11 @@
 package com.ryanstillwagon.first_tutorial;
 
-import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.Texture;
 
-public class BlockAllDirections extends MovableBlocks {
+class BlockAllDirections extends MovableBlocks {
 
-    BlockAllDirections(int xPos, int yPos, Sprite sprite){
-        super(xPos, yPos, sprite);
+    BlockAllDirections(int xPos, int yPos, Texture texture){
+        super(xPos, yPos, texture);
+        contentsKey = 3;
     }
 }

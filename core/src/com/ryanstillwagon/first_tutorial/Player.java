@@ -1,13 +1,14 @@
 package com.ryanstillwagon.first_tutorial;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
-public class Player extends Character {
+public class Player extends MapContents {
 
-    Player(int xPos, int yPos, Sprite sprite) {
+    Player(int xPos, int yPos, Texture texture) {
         this.xPos = xPos;
         this.yPos = yPos;
-        this.sprite = sprite;
+        sprite = new Sprite(texture);
         contentsKey = 3;
     }
 
@@ -24,17 +25,16 @@ public class Player extends Character {
         return sprite;
     }
     public void setXPos(int xPos){
-        this.xPos = xPos;
+        this.xPos += xPos;
     }
     public void setYPos(int yPos){
-        this.yPos = yPos;
+        this.yPos += yPos;
     }
     public void setSprite(Sprite sprite){
         this.sprite = sprite;
     }
 
-    public void update(int movementTime){
-    }
+
 
     private String stringify(int xPos, int yPos){
         return ( Integer.toString(xPos) + Integer.toString(yPos) );

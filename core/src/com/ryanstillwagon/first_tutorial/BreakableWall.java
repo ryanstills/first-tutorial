@@ -1,5 +1,6 @@
 package com.ryanstillwagon.first_tutorial;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
 public class BreakableWall extends MapContents {
@@ -8,10 +9,10 @@ public class BreakableWall extends MapContents {
     private int yPos;
     private Sprite sprite;
 
-    public BreakableWall(int xPos, int yPos, Sprite wallSprite){
+    public BreakableWall(int xPos, int yPos, Texture texture){
         this.xPos = xPos;
         this.yPos = yPos;
-        this.sprite = wallSprite;
+        sprite = new Sprite(texture);
         contentsKey = 1;
         mapContentsPositions.put(stringify(xPos,yPos), this);
     }

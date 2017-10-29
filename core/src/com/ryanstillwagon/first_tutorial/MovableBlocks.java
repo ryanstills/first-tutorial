@@ -1,5 +1,6 @@
 package com.ryanstillwagon.first_tutorial;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
 public class MovableBlocks extends MapContents {
@@ -8,11 +9,10 @@ public class MovableBlocks extends MapContents {
     protected int yPos;
     protected Sprite sprite;
 
-    public MovableBlocks(int xPos, int yPos, Sprite wallSprite){
+    public MovableBlocks(int xPos, int yPos, Texture texture){
         this.xPos = xPos;
         this.yPos = yPos;
-        this.contentsKey = 3;
-        this.sprite = wallSprite;
+        sprite = new Sprite(texture);
         mapContentsPositions.put(stringify(xPos, yPos), this);
     }
 
@@ -37,8 +37,7 @@ public class MovableBlocks extends MapContents {
         mapContentsPositions.remove(stringify(xPos,yPos));
         this.yPos += newYPos;
         mapContentsPositions.put(stringify(xPos,yPos), this);
-        checkForBreakableBlock(stringify(xPos, (yPos)));
-
+       checkForBreakableBlock(stringify(xPos, (yPos)));
     }
     public void setSprite(Sprite sprite){this.sprite = sprite;}
 

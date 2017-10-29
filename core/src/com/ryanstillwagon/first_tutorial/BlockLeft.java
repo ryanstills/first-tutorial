@@ -1,4 +1,13 @@
 package com.ryanstillwagon.first_tutorial;
 
-public class BlockLeft {
+import com.badlogic.gdx.graphics.Texture;
+
+
+class BlockLeft extends MovableBlocks {
+
+    BlockLeft(int xPos, int yPos, Texture texture){
+        super(xPos, yPos, texture);
+        contentsKey = 6;
+    }
+
 }
