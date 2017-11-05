@@ -3,7 +3,6 @@ package com.ryanstillwagon.first_tutorial;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -60,14 +59,13 @@ public class MyGdxGame extends ApplicationAdapter {
 	private int spriteSize = 64;
 	private int winWidth;
 	private int winHeight;
-	private float gameTime;
+	private int gameTime;
+	private float timeCounter;
 	private float movementTime;
 	private String timeDisplay;
 	private int keyCount;
 	private static final float moveUnit = 32.0f;
 
-	private KeyObject keyOne;
-	private String keyString;
 	private boolean masterKeySpawned;
 	private boolean exitDoorSpawned;
 
@@ -82,24 +80,20 @@ public class MyGdxGame extends ApplicationAdapter {
 						 1,1,0,1,2,1,0,0,0,0,0,1,1,0,1,1,0,1,
 						 1,1,0,0,0,1,0,1,0,1,0,1,0,0,0,3,0,0};
 
-	//FileHandle readFile = Gdx.files.local("test_level.txt");
-
-
-
 
 	private void loadTextures(){
-		level = new TmxMapLoader().load("images/sample_background.tmx");
-		playerTexture = new Texture("images/placeholder_character.png");
-		breakableWallTexture = new Texture("images/breakable_wall_green.png");
-		keyTexture = new Texture("images/key.png");
-		masterKeyTexture = new Texture("images/master_key.png");
-		exitDoorTexture = new Texture("images/castledoors.png");
+		level = new TmxMapLoader().load("assets/sample_background.tmx");
+		playerTexture = new Texture("assets/placeholder_character.png");
+		breakableWallTexture = new Texture("assets/breakable_wall_green.png");
+		keyTexture = new Texture("assets/key.png");
+		masterKeyTexture = new Texture("assets/master_key.png");
+		exitDoorTexture = new Texture("assets/castledoors.png");
 
-		movableBlockAllTexture = new Texture("images/block_any_direction.png");
-		movableBlockUpTexture = new Texture("images/block_only_up.png");
-		movableBlockDownTexture = new Texture("images/block_only_down.png");
-		movableBlockLeftTexture = new Texture("images/block_only_left.png");
-		movableBlockRightTexture = new Texture("images/block_only_right.png");
+		movableBlockAllTexture = new Texture("assets/block_any_direction.png");
+		movableBlockUpTexture = new Texture("assets/block_only_up.png");
+		movableBlockDownTexture = new Texture("assets/block_only_down.png");
+		movableBlockLeftTexture = new Texture("assets/block_only_left.png");
+		movableBlockRightTexture = new Texture("assets/block_only_right.png");
 
 		levelRenderer = new OrthogonalTiledMapRenderer(level);
 		playerCharacter = new Sprite(playerTexture);
@@ -154,8 +148,9 @@ public class MyGdxGame extends ApplicationAdapter {
 	}
 	private void renderPlayerCharacter(float elapsedTime){
 		movementTime += elapsedTime;
+		boolean move = movementTime > 0.15;
 		String positionKey;
-		if(Gdx.input.isKeyPressed(Input.Keys.W)){
+		if(Gdx.input.isKeyPressed(Input.Keys.W) && move){
 			positionKey = stringify((int)(xPosPlayer),(int)(yPosPlayer + 32));
 			//if player is at the top of the screen
 			if(yPosPlayer >= winHeight - spriteSize){
@@ -169,19 +164,18 @@ public class MyGdxGame extends ApplicationAdapter {
 			// if player moves into key space
 			else if(mapContentsPositions.containsKey(positionKey) &&
 					mapContentsPositions.get(positionKey).getContentsKey() == 2){
-				if(movementTime > 0.15f) {
+
 					yPosPlayer += moveUnit;
 					movementTime = 0;
 					mapContentsPositions.remove(positionKey);
 					keyCount--;
-				}
-			}
+		}
 			//checks for an block that can be moved in all directions or up only
 			else if(mapContentsPositions.containsKey(positionKey) &&
 					(mapContentsPositions.get(positionKey).getContentsKey() == 3 ||
 					 mapContentsPositions.get(positionKey).getContentsKey() == 5)){
 
-				if(movementTime > 0.15f && yPosPlayer <= winHeight - (spriteSize * 2) &&
+				if(yPosPlayer <= winHeight - (spriteSize * 2) &&
 						checkForMovableBlockCollision((int)xPosPlayer, (int)yPosPlayer, 0)){
 					yPosPlayer += moveUnit;
 					movementTime = 0;
@@ -194,13 +188,11 @@ public class MyGdxGame extends ApplicationAdapter {
 				yPosPlayer += 0;
 			}
 			else {
-				if(movementTime > 0.15f) {
-					yPosPlayer += moveUnit;
-					movementTime = 0;
-				}
+				yPosPlayer += moveUnit;
+				movementTime = 0;
 			}
 		}
-		else if(Gdx.input.isKeyPressed(Input.Keys.S)){
+		else if(Gdx.input.isKeyPressed(Input.Keys.S) && move){
 			positionKey = stringify((int)(xPosPlayer),(int)(yPosPlayer - 32));
 			if(yPosPlayer <= 32){
 				yPosPlayer = 32;
@@ -213,18 +205,17 @@ public class MyGdxGame extends ApplicationAdapter {
 			// Checks for key
 			else if(mapContentsPositions.containsKey(positionKey) &&
 					mapContentsPositions.get(positionKey).getContentsKey() == 2){
-				if(movementTime > 0.15f) {
+
 					yPosPlayer -= moveUnit;
 					movementTime = 0;
 					mapContentsPositions.remove(positionKey);
 					keyCount--;
-				}
 			}
 			// Checks for a block that can be move in all directions or down
 			else if(mapContentsPositions.containsKey(positionKey) &&
 					(mapContentsPositions.get(positionKey).getContentsKey() == 3 ||
 					 mapContentsPositions.get(positionKey).getContentsKey() == 4)){
-				if(movementTime > 0.15f && yPosPlayer > 64 &&
+				if(yPosPlayer > 64 &&
 						checkForMovableBlockCollision((int)xPosPlayer,(int)yPosPlayer, 1)) {
 					yPosPlayer -= moveUnit;
 					movementTime = 0;
@@ -237,13 +228,11 @@ public class MyGdxGame extends ApplicationAdapter {
 				yPosPlayer += 0;
 			}
 			else{
-				if(movementTime > 0.15f) {
-					yPosPlayer -= moveUnit;
-					movementTime = 0;
-				}
+				yPosPlayer -= moveUnit;
+				movementTime = 0;
 			}
 		}
-		else if(Gdx.input.isKeyPressed(Input.Keys.D)){
+		else if(Gdx.input.isKeyPressed(Input.Keys.D) && move){
 			positionKey = stringify((int)(xPosPlayer + 32),(int)(yPosPlayer));
 			if(xPosPlayer >= winWidth - spriteSize){
 				xPosPlayer = winWidth - spriteSize;
@@ -256,18 +245,18 @@ public class MyGdxGame extends ApplicationAdapter {
 			// if player moves into a space with a key in it
 			else if(mapContentsPositions.containsKey(positionKey) &&
 					mapContentsPositions.get(positionKey).getContentsKey() == 2){
-				if(movementTime > 0.15f) {
-					xPosPlayer += moveUnit;
-					movementTime = 0;
-					mapContentsPositions.remove(positionKey);
-					keyCount--;
-				}
+
+				xPosPlayer += moveUnit;
+				movementTime = 0;
+				mapContentsPositions.remove(positionKey);
+				keyCount--;
+
 			}
 			// checks for a block that can be move in all directions or right
 			else if(mapContentsPositions.containsKey(positionKey) &&
 					(mapContentsPositions.get(positionKey).getContentsKey() == 3 ||
 					 mapContentsPositions.get(positionKey).getContentsKey() == 7)){
-				if(movementTime > 0.15f && xPosPlayer <= winWidth - (spriteSize * 2)&&
+				if(xPosPlayer <= winWidth - (spriteSize * 2)&&
 						checkForMovableBlockCollision((int)xPosPlayer,(int)yPosPlayer, 2)) {
 
 					xPosPlayer += moveUnit;
@@ -281,13 +270,13 @@ public class MyGdxGame extends ApplicationAdapter {
 				xPosPlayer += 0;
 			}
 			else{
-				if(movementTime > 0.15f) {
-					xPosPlayer += moveUnit;
-					movementTime = 0;
-				}
+
+				xPosPlayer += moveUnit;
+				movementTime = 0;
+
 			}
 		}
-		else if(Gdx.input.isKeyPressed(Input.Keys.A)){
+		else if(Gdx.input.isKeyPressed(Input.Keys.A) && move){
 			positionKey = stringify((int)(xPosPlayer - 32),(int)(yPosPlayer ));
 			if(xPosPlayer <= 32){
 				xPosPlayer = 32;
@@ -299,18 +288,18 @@ public class MyGdxGame extends ApplicationAdapter {
 			}
 			else if(mapContentsPositions.containsKey(positionKey) &&
 					mapContentsPositions.get(positionKey).getContentsKey() == 2){
-				if(movementTime > 0.15f) {
-					xPosPlayer -= moveUnit;
-					movementTime = 0;
-					mapContentsPositions.remove(positionKey);
-					keyCount--;
-				}
+
+				xPosPlayer -= moveUnit;
+				movementTime = 0;
+				mapContentsPositions.remove(positionKey);
+				keyCount--;
+
 			}
 			//checks for a block that can be moved in all directions or left
 			else if(mapContentsPositions.containsKey(positionKey) &&
 					(mapContentsPositions.get(positionKey).getContentsKey() == 3 ||
 					 mapContentsPositions.get(positionKey).getContentsKey() == 6)){
-				if(movementTime > 0.15f  && xPosPlayer > 64 &&
+				if(xPosPlayer > 64 &&
 						checkForMovableBlockCollision((int)xPosPlayer, (int) yPosPlayer, 3)) {
 					xPosPlayer -= moveUnit;
 					movementTime = 0;
@@ -323,24 +312,27 @@ public class MyGdxGame extends ApplicationAdapter {
 				xPosPlayer += 0;
 			}
 			else{
-				if(movementTime > 0.15f) {
 					xPosPlayer -= moveUnit;
 					movementTime = 0;
-				}
 			}
 		}
 		playerCharacter.setPosition(xPosPlayer,yPosPlayer);
 		playerCharacter.draw(batch);
 	}
 	private void renderTime(float elapsedTime){
-		gameTime -= elapsedTime;
+
+		timeCounter += elapsedTime;
+		if(timeCounter > 1.0){
+			gameTime -= 1;
+			timeCounter = 0;
+		}
 		if(gameTime > 0) {
-			timeDisplay = Float.toString(gameTime);
+			timeDisplay = Integer.toString(gameTime);
 		}
 		else{
 			timeDisplay = "Time's Up!";
 		}
-		font.draw(batch, timeDisplay, 560,465);
+		font.draw(batch, timeDisplay, 555,465);
 	}
 	private void renderKeyCount(){
 		if(keyCount > 0) {
@@ -374,7 +366,8 @@ public class MyGdxGame extends ApplicationAdapter {
 		xPosPlayer = 544;
 		yPosPlayer = 320;
 		gameTime = 99;
-		movementTime = 0;
+		movementTime = 0.0f;
+		timeCounter = 0.0f;
 		keyCount = 5;
 		masterKeySpawned = false;
 	}
