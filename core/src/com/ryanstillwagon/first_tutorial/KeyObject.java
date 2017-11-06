@@ -1,18 +1,18 @@
 package com.ryanstillwagon.first_tutorial;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
 
 public class KeyObject extends MapContents {
 
     private int xPos;
     private int yPos;
-    private static Sprite sprite;
+    private Sprite sprite;
 
-    public KeyObject(int xPos, int yPos, Texture texture){
+    public KeyObject(int xPos, int yPos, TextureRegion texture){
         this.xPos = xPos;
         this.yPos = yPos;
-        if(sprite == null)
         sprite = new Sprite(texture);
         contentsKey = 2;
         mapContentsPositions.put(stringify(xPos,yPos), this);

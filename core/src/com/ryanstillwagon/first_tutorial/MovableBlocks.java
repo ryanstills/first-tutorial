@@ -1,7 +1,7 @@
 package com.ryanstillwagon.first_tutorial;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class MovableBlocks extends MapContents {
 
@@ -9,7 +9,7 @@ public class MovableBlocks extends MapContents {
     protected int yPos;
     protected Sprite sprite;
 
-    public MovableBlocks(int xPos, int yPos, Texture texture){
+    public MovableBlocks(int xPos, int yPos, TextureRegion texture){
         this.xPos = xPos;
         this.yPos = yPos;
         sprite = new Sprite(texture);

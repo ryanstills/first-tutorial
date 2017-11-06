@@ -3,7 +3,7 @@ package com.ryanstillwagon.first_tutorial.client;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import com.ryanstillwagon.first_tutorial.MyGdxGame;
+import com.ryanstillwagon.first_tutorial.WizardEscape;
 
 public class HtmlLauncher extends GwtApplication {
 
@@ -14,6 +14,6 @@ public class HtmlLauncher extends GwtApplication {
 
         @Override
         public ApplicationListener createApplicationListener () {
-                return new MyGdxGame();
+                return new WizardEscape();
         }
 }

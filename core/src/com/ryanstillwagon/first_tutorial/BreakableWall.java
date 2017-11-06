@@ -2,6 +2,7 @@ package com.ryanstillwagon.first_tutorial;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class BreakableWall extends MapContents {
 
@@ -9,7 +10,7 @@ public class BreakableWall extends MapContents {
     private int yPos;
     private Sprite sprite;
 
-    public BreakableWall(int xPos, int yPos, Texture texture){
+    public BreakableWall(int xPos, int yPos, TextureRegion texture){
         this.xPos = xPos;
         this.yPos = yPos;
         sprite = new Sprite(texture);

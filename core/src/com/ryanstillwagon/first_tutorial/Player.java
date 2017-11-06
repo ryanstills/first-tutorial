@@ -1,11 +1,11 @@
 package com.ryanstillwagon.first_tutorial;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Player extends MapContents {
 
-    Player(int xPos, int yPos, Texture texture) {
+    Player(int xPos, int yPos, TextureRegion texture) {
         this.xPos = xPos;
         this.yPos = yPos;
         sprite = new Sprite(texture);

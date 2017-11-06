@@ -1,6 +1,7 @@
 package com.ryanstillwagon.first_tutorial;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -12,6 +13,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.ryanstillwagon.first_tutorial.managers.MapsManager;
 
 import java.util.ArrayList;
 
@@ -34,23 +36,13 @@ Contents Key:
 9 - player character
 10 - enemy character (not in use yet)
 */
-public class MyGdxGame extends ApplicationAdapter {
+public class WizardEscape extends Game {
 	private SpriteBatch batch;
 	private Sprite playerCharacter;
 	private OrthographicCamera camera;
-	private Texture playerTexture;
-	private Texture breakableWallTexture;
-	private Texture keyTexture;
-	private Texture masterKeyTexture;
-	private Texture exitDoorTexture;
-	private Texture movableBlockAllTexture;
-	private Texture movableBlockUpTexture;
-	private Texture movableBlockDownTexture;
-	private Texture movableBlockLeftTexture;
-	private Texture movableBlockRightTexture;
-	private Texture[] contentsTextures;
+	private Resources res;
+	private TextureRegion[] contentsTextures;
 	private int[] mapContentsLocations;
-	private static ArrayList<MapContents> levelLayout;
 	private TiledMap level;
 	private TiledMapRenderer levelRenderer;
 	private BitmapFont font;
@@ -65,60 +57,41 @@ public class MyGdxGame extends ApplicationAdapter {
 	private String timeDisplay;
 	private int keyCount;
 	private static final float moveUnit = 32.0f;
+//	KeyObject masterKey;
+//	KeyObject exitDoor;
 
-	private boolean masterKeySpawned;
-	private boolean exitDoorSpawned;
 
-	private int[] map = {2,1,0,0,0,0,0,0,0,0,1,0,1,1,1,1,2,1,
-						 0,1,0,0,3,1,0,1,0,1,0,0,0,0,0,1,1,1,
-						 0,1,1,0,0,0,1,0,0,0,0,3,1,0,1,0,0,1,
-						 0,0,0,1,0,0,0,0,0,0,1,0,0,0,1,1,0,0,
-						 1,1,1,1,0,3,0,4,0,1,1,1,0,1,0,0,1,0,
-						 0,0,1,2,1,0,0,0,0,1,2,1,0,1,0,3,0,0,
-						 1,0,1,1,1,0,0,0,0,1,1,1,0,0,0,9,0,0,
-						 0,0,1,0,0,1,0,1,0,1,0,0,1,0,0,0,0,1,
-						 1,1,0,1,2,1,0,0,0,0,0,1,1,0,1,1,0,1,
-						 1,1,0,0,0,1,0,1,0,1,0,1,0,0,0,3,0,0};
-
+	private MapsManager mapsManager;
 
 	private void loadTextures(){
-		level = new TmxMapLoader().load("assets/sample_background.tmx");
-		playerTexture = new Texture("assets/placeholder_character.png");
-		breakableWallTexture = new Texture("assets/breakable_wall_green.png");
-		keyTexture = new Texture("assets/key.png");
-		masterKeyTexture = new Texture("assets/master_key.png");
-		exitDoorTexture = new Texture("assets/castledoors.png");
-
-		movableBlockAllTexture = new Texture("assets/block_any_direction.png");
-		movableBlockUpTexture = new Texture("assets/block_only_up.png");
-		movableBlockDownTexture = new Texture("assets/block_only_down.png");
-		movableBlockLeftTexture = new Texture("assets/block_only_left.png");
-		movableBlockRightTexture = new Texture("assets/block_only_right.png");
+		level = new TmxMapLoader().load("sample_background.tmx");
 
 		levelRenderer = new OrthogonalTiledMapRenderer(level);
-		playerCharacter = new Sprite(playerTexture);
+		playerCharacter = new Sprite(res.playerTexture);
 
-		contentsTextures[1] = breakableWallTexture;
-		contentsTextures[2] = keyTexture;
-		contentsTextures[3] = movableBlockAllTexture;
-		contentsTextures[4] = movableBlockDownTexture;
-		contentsTextures[5] = movableBlockUpTexture;
-		contentsTextures[6] = movableBlockLeftTexture;
-		contentsTextures[7] = movableBlockRightTexture;
-		contentsTextures[9] = playerTexture;
+		contentsTextures[1] = res.breakableWallTexture;
+		contentsTextures[2] = res.keyTexture;
+		contentsTextures[3] = res.movableBlockAllTexture;
+		contentsTextures[4] = res.movableBlockDownTexture;
+		contentsTextures[5] = res.movableBlockUpTexture;
+		contentsTextures[6] = res.movableBlockLeftTexture;
+		contentsTextures[7] = res.movableBlockRightTexture;
+		contentsTextures[9] = res.playerTexture;
 	}
 	private void loadMap() {
 		int xPos = 32;
 		int yPos = 32;
 		int positionCount = 0;
+		int level = 1;
+		int[] map = mapsManager.getMap(level);
 
-		for(int i = 0; i < map.length; i++){
-			mapContentsLocations[i] = map[i];
-		}
 		for(int i = 0; i < mapContentsLocations.length; i++){
 
-			MapContents temp = MapContents.getContent(xPos, yPos, contentsTextures, mapContentsLocations[i]);
-			levelLayout.add(temp);
+			if(map[i] == 9){
+				xPosPlayer = xPos;
+				yPosPlayer = yPos;
+			}
+			MapContents temp = MapContents.getContent(xPos, yPos, contentsTextures, map[i]);
 
 			if(positionCount < 17){
 				xPos += 32;
@@ -339,19 +312,26 @@ public class MyGdxGame extends ApplicationAdapter {
 			font.draw(batch, Integer.toString(keyCount) + " keys left", 32, 465);
 		}
 		else if(keyCount == 0){
+
 			font.draw(batch, "Master key has spawned!" , 32, 465);
+//			batch.draw(masterKey.getSprite(), masterKey.getXPos(), masterKey.getYPos());
 		}
 		else{
 			font.draw(batch, "Door has spawned!", 32 , 465);
+//			batch.draw(exitDoor.getSprite(), exitDoor.getXPos(), exitDoor.getYPos());
 		}
 	}
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		levelLayout = new ArrayList<MapContents>();
-		contentsTextures = new Texture[11];
+		contentsTextures = new TextureRegion[11];
 		mapContentsLocations = new int[233];
+		mapsManager = new MapsManager();
+		res = new Resources();
+//		masterKey = new KeyObject(32, 416, res.masterKeyTexture);
+//		exitDoor = new KeyObject(32, 0, res.exitDoorTexture);
+
 
 		winWidth = Gdx.graphics.getWidth();
 		winHeight = Gdx.graphics.getHeight();
@@ -363,13 +343,10 @@ public class MyGdxGame extends ApplicationAdapter {
 		loadMap();
 		loadFont();
 
-		xPosPlayer = 544;
-		yPosPlayer = 320;
 		gameTime = 99;
 		movementTime = 0.0f;
 		timeCounter = 0.0f;
 		keyCount = 5;
-		masterKeySpawned = false;
 	}
 	@Override
 	public void render () {
@@ -389,11 +366,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	@Override
 	public void dispose () {
 		batch.dispose();
-		for(int i = 0; i < contentsTextures.length; i++){
-			if(contentsTextures[i] != null) {
-				contentsTextures[i].dispose();
-			}
-		}
+		res.dispose();
 		level.dispose();
 		font.dispose();
 	}

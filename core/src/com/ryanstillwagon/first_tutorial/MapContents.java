@@ -2,6 +2,7 @@ package com.ryanstillwagon.first_tutorial;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +29,7 @@ abstract class MapContents {
     protected int contentsKey;
     protected Sprite sprite;
 
-    static MapContents getContent(int xPos, int yPos, Texture[] textures, int key){
+    static MapContents getContent(int xPos, int yPos, TextureRegion[] textures, int key){
         switch (key){
             case 1:{
                 return new BreakableWall(xPos, yPos, textures[1]);
@@ -59,7 +60,6 @@ abstract class MapContents {
             }
         }
     }
-
     abstract int getXPos();
     abstract int getYPos();
     abstract int getContentsKey();
