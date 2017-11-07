@@ -7,7 +7,7 @@ import com.ryanstillwagon.first_tutorial.WizardEscape;
 
 public class DesktopLauncher {
 	public static void main(String[] arg) {
-		Pack();
+		//Pack();
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		new LwjglApplication(new WizardEscape(), "Escape from the Wizard's Keep"
 				, 640, 480);

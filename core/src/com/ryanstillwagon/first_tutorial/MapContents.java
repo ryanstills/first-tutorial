@@ -1,12 +1,10 @@
 package com.ryanstillwagon.first_tutorial;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import java.util.HashMap;
 import java.util.Map;
-
 /*
 Contents Key:
 1 - breakable wall
@@ -21,15 +19,15 @@ Contents Key:
 10 - enemy character (not in use yet)
 */
 
-abstract class MapContents {
+public abstract class MapContents {
 
     public static Map<String, MapContents> mapContentsPositions = new HashMap<String, MapContents>();
     protected int xPos;
     protected int yPos;
     protected int contentsKey;
-    protected Sprite sprite;
+    Sprite sprite;
 
-    static MapContents getContent(int xPos, int yPos, TextureRegion[] textures, int key){
+    public static MapContents getContent(int xPos, int yPos, TextureRegion[] textures, int key){
         switch (key){
             case 1:{
                 return new BreakableWall(xPos, yPos, textures[1]);
@@ -60,13 +58,13 @@ abstract class MapContents {
             }
         }
     }
-    abstract int getXPos();
-    abstract int getYPos();
-    abstract int getContentsKey();
-    abstract Sprite getSprite();
-    abstract void setXPos(int xPos);
-    abstract void setYPos(int yPos);
-    abstract void setSprite(Sprite sprite);
+    abstract public int getXPos();
+    abstract public int getYPos();
+    abstract public int getContentsKey();
+    abstract public Sprite getSprite();
+    abstract public void setXPos(int xPos);
+    abstract public void setYPos(int yPos);
+    abstract public void setSprite(Sprite sprite);
 
 
 }

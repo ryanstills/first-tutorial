@@ -2,6 +2,7 @@ package com.ryanstillwagon.first_tutorial.managers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+
 import java.util.ArrayList;
 
 public class MapsManager {
@@ -16,6 +17,7 @@ public class MapsManager {
 //            0,0,1,0,0,1,0,1,0,1,0,0,1,0,0,0,0,1,
 //            1,1,0,1,2,1,0,0,0,0,0,1,1,0,1,1,0,1,
 //            1,1,0,0,0,1,0,1,0,1,0,1,0,0,0,3,0,0};
+
 
     private ArrayList<int []> mapList;
     private FileHandle[] mapFiles;
