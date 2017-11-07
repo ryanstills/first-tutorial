@@ -1,13 +1,12 @@
 package com.ryanstillwagon.first_tutorial;
 
-import com.badlogic.gdx.ApplicationAdapter;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
@@ -15,7 +14,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.ryanstillwagon.first_tutorial.managers.MapsManager;
 
-import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.ryanstillwagon.first_tutorial.MapContents.mapContentsPositions;
 
@@ -57,10 +56,8 @@ public class WizardEscape extends Game {
 	private String timeDisplay;
 	private int keyCount;
 	private static final float moveUnit = 32.0f;
-//	KeyObject masterKey;
-//	KeyObject exitDoor;
-
-
+	KeyObject masterKey;
+	KeyObject exitDoor;
 	private MapsManager mapsManager;
 
 	private void loadTextures(){
@@ -314,11 +311,19 @@ public class WizardEscape extends Game {
 		else if(keyCount == 0){
 
 			font.draw(batch, "Master key has spawned!" , 32, 465);
-//			batch.draw(masterKey.getSprite(), masterKey.getXPos(), masterKey.getYPos());
+			if(masterKey == null){
+			masterKey = new KeyObject(ThreadLocalRandom.current().nextInt(1,19) * 32,
+					416, res.masterKeyTexture);
+			}
+			batch.draw(masterKey.getSprite(), masterKey.getXPos(), masterKey.getYPos());
 		}
 		else{
 			font.draw(batch, "Door has spawned!", 32 , 465);
-//			batch.draw(exitDoor.getSprite(), exitDoor.getXPos(), exitDoor.getYPos());
+			if(exitDoor == null) {
+				exitDoor = new KeyObject(ThreadLocalRandom.current().nextInt(1, 19) * 32,
+						0, res.exitDoorTexture);
+			}
+			batch.draw(exitDoor.getSprite(), exitDoor.getXPos(), exitDoor.getYPos());
 		}
 	}
 
@@ -329,8 +334,7 @@ public class WizardEscape extends Game {
 		mapContentsLocations = new int[233];
 		mapsManager = new MapsManager();
 		res = new Resources();
-//		masterKey = new KeyObject(32, 416, res.masterKeyTexture);
-//		exitDoor = new KeyObject(32, 0, res.exitDoorTexture);
+
 
 
 		winWidth = Gdx.graphics.getWidth();
