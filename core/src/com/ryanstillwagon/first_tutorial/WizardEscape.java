@@ -16,7 +16,7 @@ import com.ryanstillwagon.first_tutorial.managers.MapsManager;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import static com.ryanstillwagon.first_tutorial.MapContents.mapContentsPositions;
+import static com.ryanstillwagon.first_tutorial.MapContents.*;
 
 /*
 	Map size: 		640 x 480
@@ -41,7 +41,6 @@ public class WizardEscape extends Game {
 	private OrthographicCamera camera;
 	public Resources res;
 	private TextureRegion[] contentsTextures;
-	private int[] mapContentsLocations;
 	private TiledMap level;
 	private TiledMapRenderer levelRenderer;
 	private BitmapFont font;
@@ -82,7 +81,7 @@ public class WizardEscape extends Game {
 		int level = 1;
 		int[] map = mapsManager.getMap(level);
 
-		for(int i = 0; i < mapContentsLocations.length; i++){
+		for(int i = 0; i < map.length; i++){
 
 			if(map[i] == 9){
 				xPosPlayer = xPos;
@@ -115,6 +114,15 @@ public class WizardEscape extends Game {
 		for(MapContents content : mapContentsPositions.values()){
 			batch.draw(content.getSprite(), content.getXPos(), content.getYPos());
 		}
+//        for(MapContents content : breakableWallPositions.values()){
+//            batch.draw(content.getSprite(), content.getXPos(), content.getYPos());
+//        }
+//        for(MapContents content : movableBlockPositions.values()){
+//            batch.draw(content.getSprite(), content.getXPos(), content.getYPos());
+//        }
+//        for (MapContents content : keyPositions.values()){
+//            batch.draw(content.getSprite(), content.getXPos(), content.getYPos());
+//        }
 	}
 	private void renderPlayerCharacter(float elapsedTime){
 		movementTime += elapsedTime;
@@ -331,7 +339,6 @@ public class WizardEscape extends Game {
 	public void create () {
 		batch = new SpriteBatch();
 		contentsTextures = new TextureRegion[11];
-		mapContentsLocations = new int[233];
 		mapsManager = new MapsManager();
 		res = new Resources();
 

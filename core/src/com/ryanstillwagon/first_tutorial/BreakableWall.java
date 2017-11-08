@@ -16,6 +16,7 @@ public class BreakableWall extends MapContents {
         sprite = new Sprite(texture);
         contentsKey = 1;
         mapContentsPositions.put(stringify(xPos,yPos), this);
+        breakableWallPositions.put(stringify(xPos,yPos), this);
     }
 
     public int getXPos(){

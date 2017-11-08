@@ -14,6 +14,7 @@ public class MovableBlocks extends MapContents {
         this.yPos = yPos;
         sprite = new Sprite(texture);
         mapContentsPositions.put(stringify(xPos, yPos), this);
+        movableBlockPositions.put(stringify(xPos, yPos), this);
     }
 
     public int getXPos(){

@@ -24,6 +24,9 @@ Contents Key:
 abstract class MapContents {
 
     public static Map<String, MapContents> mapContentsPositions = new HashMap<String, MapContents>();
+    public static Map<String, BreakableWall> breakableWallPositions = new HashMap<String, BreakableWall>();
+    public static Map<String, KeyObject> keyPositions = new HashMap<String, KeyObject>();
+    public static Map<String, MovableBlocks> movableBlockPositions = new HashMap<String, MovableBlocks>();
     protected int xPos;
     protected int yPos;
     protected int contentsKey;

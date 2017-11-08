@@ -16,6 +16,7 @@ public class KeyObject extends MapContents {
         sprite = new Sprite(texture);
         contentsKey = 2;
         mapContentsPositions.put(stringify(xPos,yPos), this);
+        keyPositions.put(stringify(xPos,yPos), this);
     }
 
     public int getXPos(){
