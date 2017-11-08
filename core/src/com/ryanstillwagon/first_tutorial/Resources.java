@@ -6,21 +6,25 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Resources {
 
+    public final int TILE_SIZE = 32;
     TextureAtlas gameTextures;
 
-    TextureRegion playerTexture;
-    TextureRegion breakableWallTexture;
-    TextureRegion keyTexture;
-    TextureRegion masterKeyTexture;
-    TextureRegion exitDoorTexture;
-    TextureRegion movableBlockAllTexture;
-    TextureRegion movableBlockUpTexture;
-    TextureRegion movableBlockDownTexture;
-    TextureRegion movableBlockLeftTexture;
-    TextureRegion movableBlockRightTexture;
+    public TextureRegion titleScreen;
+    public TextureRegion playerTexture;
+    public TextureRegion breakableWallTexture;
+    public TextureRegion keyTexture;
+    public TextureRegion masterKeyTexture;
+    public TextureRegion exitDoorTexture;
+    public TextureRegion movableBlockAllTexture;
+    public TextureRegion movableBlockUpTexture;
+    public TextureRegion movableBlockDownTexture;
+    public TextureRegion movableBlockLeftTexture;
+    public TextureRegion movableBlockRightTexture;
 
     public Resources(){
         gameTextures = new TextureAtlas(Gdx.files.internal("packed/game.atlas"));
+
+        titleScreen = gameTextures.findRegion("title_screen");
         playerTexture = gameTextures.findRegion("placeholder_character");
         breakableWallTexture = gameTextures.findRegion("breakable_wall_green");
         keyTexture = gameTextures.findRegion("key");

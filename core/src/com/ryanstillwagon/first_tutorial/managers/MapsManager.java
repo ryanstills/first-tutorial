@@ -29,8 +29,8 @@ public class MapsManager {
         for(FileHandle map : mapFiles){
             int[] tempMap = new int[233];
             String testString = map.readString();
-            for(int i = 0, j = 0; j < testString.length(); i++, j += 2) {
-                tempMap[i] = (int)testString.charAt(j) - 48;
+            for(int i = 0; i < testString.length(); i++) {
+                tempMap[i] = (int)testString.charAt(i) - 48;
             }
             mapList.add(tempMap);
         }

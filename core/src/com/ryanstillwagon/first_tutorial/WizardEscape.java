@@ -36,10 +36,10 @@ Contents Key:
 10 - enemy character (not in use yet)
 */
 public class WizardEscape extends Game {
-	private SpriteBatch batch;
+	public SpriteBatch batch;
 	private Sprite playerCharacter;
 	private OrthographicCamera camera;
-	private Resources res;
+	public Resources res;
 	private TextureRegion[] contentsTextures;
 	private int[] mapContentsLocations;
 	private TiledMap level;
@@ -334,8 +334,6 @@ public class WizardEscape extends Game {
 		mapContentsLocations = new int[233];
 		mapsManager = new MapsManager();
 		res = new Resources();
-
-
 
 		winWidth = Gdx.graphics.getWidth();
 		winHeight = Gdx.graphics.getHeight();
