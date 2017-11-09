@@ -36,28 +36,27 @@ Contents Key:
 10 - enemy character (not in use yet)
 */
 public class WizardEscape extends Game {
-	public SpriteBatch batch;
+	private SpriteBatch batch;
 	private Sprite playerCharacter;
 	private OrthographicCamera camera;
-	public Resources res;
+	private Resources res;
 	private TextureRegion[] contentsTextures;
 	private TiledMap level;
 	private TiledMapRenderer levelRenderer;
 	private BitmapFont font;
 	private static float xPosPlayer;
 	private static float yPosPlayer;
-	private int spriteSize = 64;
 	private int winWidth;
 	private int winHeight;
 	private int gameTime;
-	public int levelScore;
+	private int levelScore;
 	private float timeCounter;
 	private float movementTime;
 	private String timeDisplay;
 	private int keyCount;
 	private static final float moveUnit = 32.0f;
-	KeyObject masterKey;
-	KeyObject exitDoor;
+	private KeyObject masterKey;
+	private KeyObject exitDoor;
 	private MapsManager mapsManager;
 
 	private void loadTextures(){
@@ -105,7 +104,6 @@ public class WizardEscape extends Game {
 		font = new BitmapFont();
 		font.setColor(Color.YELLOW);
 	}
-
 	private void renderLevel(){
 		camera.update();
 		levelRenderer.setView(camera);
@@ -133,8 +131,8 @@ public class WizardEscape extends Game {
 		if(Gdx.input.isKeyPressed(Input.Keys.W) && move){
 		    movePositionKey = stringify((int)xPosPlayer, (int)(yPosPlayer + res.TILE_SIZE));
 		    //if the boundary or a breakable block is above the player
-		    if((yPosPlayer >= winHeight - res.TILE_SIZE * 2) ||
-                    breakableWallPositions.containsKey(movePositionKey)  ){
+		    if(((yPosPlayer >= winHeight - res.TILE_SIZE * 2) ||
+                    breakableWallPositions.containsKey(movePositionKey))){
 		        yPosPlayer += 0;
             }
             //if a movable block is above the player
@@ -176,8 +174,9 @@ public class WizardEscape extends Game {
         else if(Gdx.input.isKeyPressed(Input.Keys.S) && move){
             movePositionKey = stringify((int)xPosPlayer, (int)(yPosPlayer - res.TILE_SIZE));
             //if the boundary or a breakable block is above the player
-            if((yPosPlayer <= res.TILE_SIZE) ||
-                    breakableWallPositions.containsKey(movePositionKey)  ){
+            if(((yPosPlayer <= res.TILE_SIZE) ||
+                    breakableWallPositions.containsKey(movePositionKey))  &&
+                    !keyPositions.containsKey(movePositionKey)){
                 yPosPlayer -= 0;
             }
             //if a movable block is below the player
@@ -220,7 +219,8 @@ public class WizardEscape extends Game {
             movePositionKey = stringify((int)xPosPlayer  + res.TILE_SIZE, (int)(yPosPlayer));
             //if the boundary or a breakable block is to the right of the player
             if((xPosPlayer >= winWidth - res.TILE_SIZE * 2) ||
-                    breakableWallPositions.containsKey(movePositionKey)  ){
+                    breakableWallPositions.containsKey(movePositionKey) &&
+                    !keyPositions.containsKey(movePositionKey)){
                 xPosPlayer += 0;
             }
             //if a movable block is to the right of the player
@@ -263,7 +263,8 @@ public class WizardEscape extends Game {
             movePositionKey = stringify((int)xPosPlayer  - res.TILE_SIZE, (int)(yPosPlayer));
             //if the boundary or a breakable block is to the right of the player
             if((xPosPlayer <= res.TILE_SIZE) ||
-                    breakableWallPositions.containsKey(movePositionKey)  ){
+                    breakableWallPositions.containsKey(movePositionKey) &&
+                    !keyPositions.containsKey(movePositionKey)){
                 xPosPlayer += 0;
             }
             //if a movable block is to the right of the player
@@ -328,19 +329,24 @@ public class WizardEscape extends Game {
 
 			font.draw(batch, "Master key has spawned!" , 32, 465);
 			if(masterKey == null){
-			masterKey = new KeyObject(ThreadLocalRandom.current().nextInt(1,19) * 32,
-					416, res.masterKeyTexture);
+			    int x = ThreadLocalRandom.current().nextInt(1,19) * 32;
+			    int y = 416;
+			    masterKey = new KeyObject(x,y, res.masterKeyTexture);
+			    keyPositions.put(stringify(x,y), masterKey);
 			}
-			batch.draw(masterKey.getSprite(), masterKey.getXPos(), masterKey.getYPos());
 		}
-		else{
+		else if(keyCount == -1){
 			font.draw(batch, "Door has spawned!", 32 , 465);
 			if(exitDoor == null) {
-				exitDoor = new KeyObject(ThreadLocalRandom.current().nextInt(1, 19) * 32,
-						0, res.exitDoorTexture);
+			    int x = ThreadLocalRandom.current().nextInt(1, 19) * 32;
+			    int y = 0;
+				exitDoor = new KeyObject(x,	y, res.exitDoorTexture);
+				keyPositions.put(stringify(x,y), exitDoor);
 			}
-			batch.draw(exitDoor.getSprite(), exitDoor.getXPos(), exitDoor.getYPos());
 		}
+		else{
+		    font.draw(batch, "VICTORY", (winWidth / 2) - res.TILE_SIZE, winHeight /2);
+        }
 	}
 	private void renderScore(){
 	    font.draw(batch, "Score: " + Integer.toString((int)(levelScore * gameTime * 0.1f)), 275, 465);
@@ -391,44 +397,6 @@ public class WizardEscape extends Game {
 		res.dispose();
 		level.dispose();
 		font.dispose();
-	}
-
-	private boolean checkForMovableBlockCollision(int xPosPlayer, int yPosPlayer, int directionKey){
-		String movePositionKey;
-		//up
-		if(directionKey == 0){
-			movePositionKey = stringify(xPosPlayer, yPosPlayer + 64);
-			if(!mapContentsPositions.containsKey(movePositionKey))
-				return true;
-			return (mapContentsPositions.get(movePositionKey).getContentsKey() < 3 ||
-				    mapContentsPositions.get(movePositionKey).getContentsKey() > 7);
-		}
-		//down
-		else if(directionKey == 1){
-			movePositionKey = stringify(xPosPlayer, yPosPlayer - 64);
-			if(!mapContentsPositions.containsKey(movePositionKey))
-				return true;
-			return ((mapContentsPositions.get(movePositionKey).getContentsKey() < 3) ||
-					(mapContentsPositions.get(movePositionKey).getContentsKey() > 7));
-		}
-		//right
-		else if(directionKey == 2){
-			movePositionKey = stringify(xPosPlayer + 64, yPosPlayer);
-			if(!mapContentsPositions.containsKey(movePositionKey))
-				return true;
-			return ((mapContentsPositions.get(movePositionKey).getContentsKey() < 3) ||
-					(mapContentsPositions.get(movePositionKey).getContentsKey() > 7));
-
-		}
-		//left
-		else{
-			movePositionKey = stringify(xPosPlayer - 64, yPosPlayer);
-			if(!mapContentsPositions.containsKey(movePositionKey))
-				return true;
-			return ((mapContentsPositions.get(movePositionKey).getContentsKey() < 3) ||
-					(mapContentsPositions.get(movePositionKey).getContentsKey() > 7));
-
-		}
 	}
 	private String stringify(int xPos, int yPos){
 		return ( Integer.toString(xPos) + Integer.toString(yPos) );
