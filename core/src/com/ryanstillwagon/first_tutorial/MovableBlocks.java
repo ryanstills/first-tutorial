@@ -29,28 +29,18 @@ public class MovableBlocks extends MapContents {
     }
 
     public void setXPos(int newXPos){
-        mapContentsPositions.remove(stringify(xPos, yPos));
+        movableBlockPositions.remove(stringify(xPos, yPos));
         this.xPos += newXPos;
-        mapContentsPositions.put(stringify(xPos, yPos), this);
-        checkForBreakableBlock(stringify(xPos, (yPos)));
+        movableBlockPositions.put(stringify(xPos, yPos), this);
     }
     public void setYPos(int newYPos){
-        mapContentsPositions.remove(stringify(xPos,yPos));
+        movableBlockPositions.remove(stringify(xPos,yPos));
         this.yPos += newYPos;
-        mapContentsPositions.put(stringify(xPos,yPos), this);
-       checkForBreakableBlock(stringify(xPos, (yPos)));
+        movableBlockPositions.put(stringify(xPos,yPos), this);
     }
     public void setSprite(Sprite sprite){this.sprite = sprite;}
 
     public String stringify(int xPos, int yPos){
         return ( Integer.toString(xPos) + Integer.toString(yPos) );
-    }
-
-    private void checkForBreakableBlock(String positionKey){
-        if(mapContentsPositions.containsKey(positionKey) &&
-           mapContentsPositions.get(positionKey).getContentsKey() == 1){
-
-            mapContentsPositions.remove(positionKey);
-        }
     }
 }

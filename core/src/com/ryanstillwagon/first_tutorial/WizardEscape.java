@@ -50,6 +50,7 @@ public class WizardEscape extends Game {
 	private int winWidth;
 	private int winHeight;
 	private int gameTime;
+	public int levelScore;
 	private float timeCounter;
 	private float movementTime;
 	private String timeDisplay;
@@ -111,189 +112,196 @@ public class WizardEscape extends Game {
 		levelRenderer.render();
 	}
 	private void renderMap(){
-		for(MapContents content : mapContentsPositions.values()){
-			batch.draw(content.getSprite(), content.getXPos(), content.getYPos());
-		}
-//        for(MapContents content : breakableWallPositions.values()){
-//            batch.draw(content.getSprite(), content.getXPos(), content.getYPos());
-//        }
-//        for(MapContents content : movableBlockPositions.values()){
-//            batch.draw(content.getSprite(), content.getXPos(), content.getYPos());
-//        }
-//        for (MapContents content : keyPositions.values()){
-//            batch.draw(content.getSprite(), content.getXPos(), content.getYPos());
-//        }
+//		for(MapContents content : mapContentsPositions.values()){
+//			batch.draw(content.getSprite(), content.getXPos(), content.getYPos());
+//		}
+        for(MapContents content : breakableWallPositions.values()){
+            batch.draw(content.getSprite(), content.getXPos(), content.getYPos());
+        }
+        for (MapContents content : keyPositions.values()){
+            batch.draw(content.getSprite(), content.getXPos(), content.getYPos());
+        }
+        for(MapContents content : movableBlockPositions.values()){
+            batch.draw(content.getSprite(), content.getXPos(), content.getYPos());
+        }
 	}
 	private void renderPlayerCharacter(float elapsedTime){
 		movementTime += elapsedTime;
 		boolean move = movementTime > 0.15;
-		String positionKey;
+		String movePositionKey;
+
 		if(Gdx.input.isKeyPressed(Input.Keys.W) && move){
-			positionKey = stringify((int)(xPosPlayer),(int)(yPosPlayer + 32));
-			//if player is at the top of the screen
-			if(yPosPlayer >= winHeight - spriteSize){
-				yPosPlayer += 0;
-			}
-			// If there is a breakable block do not move
-			else if(mapContentsPositions.containsKey(positionKey) &&
-					mapContentsPositions.get(positionKey).getContentsKey() == 1){
-				yPosPlayer += 0;
-			}
-			// if player moves into key space
-			else if(mapContentsPositions.containsKey(positionKey) &&
-					mapContentsPositions.get(positionKey).getContentsKey() == 2){
-
-					yPosPlayer += moveUnit;
-					movementTime = 0;
-					mapContentsPositions.remove(positionKey);
-					keyCount--;
-		}
-			//checks for an block that can be moved in all directions or up only
-			else if(mapContentsPositions.containsKey(positionKey) &&
-					(mapContentsPositions.get(positionKey).getContentsKey() == 3 ||
-					 mapContentsPositions.get(positionKey).getContentsKey() == 5)){
-
-				if(yPosPlayer <= winHeight - (spriteSize * 2) &&
-						checkForMovableBlockCollision((int)xPosPlayer, (int)yPosPlayer, 0)){
-					yPosPlayer += moveUnit;
-					movementTime = 0;
-					mapContentsPositions.get(positionKey).setYPos(32);
-				}
-			}
-			else if(mapContentsPositions.containsKey(positionKey) &&
-					mapContentsPositions.get(positionKey).getContentsKey() != 5){
-
-				yPosPlayer += 0;
-			}
-			else {
-				yPosPlayer += moveUnit;
-				movementTime = 0;
-			}
-		}
-		else if(Gdx.input.isKeyPressed(Input.Keys.S) && move){
-			positionKey = stringify((int)(xPosPlayer),(int)(yPosPlayer - 32));
-			if(yPosPlayer <= 32){
-				yPosPlayer = 32;
-			}
-			// If there is a breakable block do not move
-			else if(mapContentsPositions.containsKey(positionKey) &&
-					mapContentsPositions.get(positionKey).getContentsKey() == 1){
-				yPosPlayer += 0;
-			}
-			// Checks for key
-			else if(mapContentsPositions.containsKey(positionKey) &&
-					mapContentsPositions.get(positionKey).getContentsKey() == 2){
-
-					yPosPlayer -= moveUnit;
-					movementTime = 0;
-					mapContentsPositions.remove(positionKey);
-					keyCount--;
-			}
-			// Checks for a block that can be move in all directions or down
-			else if(mapContentsPositions.containsKey(positionKey) &&
-					(mapContentsPositions.get(positionKey).getContentsKey() == 3 ||
-					 mapContentsPositions.get(positionKey).getContentsKey() == 4)){
-				if(yPosPlayer > 64 &&
-						checkForMovableBlockCollision((int)xPosPlayer,(int)yPosPlayer, 1)) {
-					yPosPlayer -= moveUnit;
-					movementTime = 0;
-					mapContentsPositions.get(positionKey).setYPos(-32);
-				}
-			}
-			else if(mapContentsPositions.containsKey(positionKey) &&
-					mapContentsPositions.get(positionKey).getContentsKey() != 4){
-
-				yPosPlayer += 0;
-			}
-			else{
-				yPosPlayer -= moveUnit;
-				movementTime = 0;
-			}
-		}
-		else if(Gdx.input.isKeyPressed(Input.Keys.D) && move){
-			positionKey = stringify((int)(xPosPlayer + 32),(int)(yPosPlayer));
-			if(xPosPlayer >= winWidth - spriteSize){
-				xPosPlayer = winWidth - spriteSize;
-			}
-			// If there is a breakable block do not move
-			else if(mapContentsPositions.containsKey(positionKey) &&
-					mapContentsPositions.get(positionKey).getContentsKey() == 1){
-				xPosPlayer += 0;
-			}
-			// if player moves into a space with a key in it
-			else if(mapContentsPositions.containsKey(positionKey) &&
-					mapContentsPositions.get(positionKey).getContentsKey() == 2){
-
-				xPosPlayer += moveUnit;
-				movementTime = 0;
-				mapContentsPositions.remove(positionKey);
-				keyCount--;
-
-			}
-			// checks for a block that can be move in all directions or right
-			else if(mapContentsPositions.containsKey(positionKey) &&
-					(mapContentsPositions.get(positionKey).getContentsKey() == 3 ||
-					 mapContentsPositions.get(positionKey).getContentsKey() == 7)){
-				if(xPosPlayer <= winWidth - (spriteSize * 2)&&
-						checkForMovableBlockCollision((int)xPosPlayer,(int)yPosPlayer, 2)) {
-
-					xPosPlayer += moveUnit;
-					movementTime = 0;
-					mapContentsPositions.get(positionKey).setXPos(32);
-				}
-			}
-			else if(mapContentsPositions.containsKey(positionKey) &&
-					mapContentsPositions.get(positionKey).getContentsKey() != 7){
-
-				xPosPlayer += 0;
-			}
-			else{
-
-				xPosPlayer += moveUnit;
-				movementTime = 0;
-
-			}
-		}
-		else if(Gdx.input.isKeyPressed(Input.Keys.A) && move){
-			positionKey = stringify((int)(xPosPlayer - 32),(int)(yPosPlayer ));
-			if(xPosPlayer <= 32){
-				xPosPlayer = 32;
-			}
-			// If there is a breakable block do not move
-			else if(mapContentsPositions.containsKey(positionKey) &&
-					mapContentsPositions.get(positionKey).getContentsKey() == 1){
-				xPosPlayer += 0;
-			}
-			else if(mapContentsPositions.containsKey(positionKey) &&
-					mapContentsPositions.get(positionKey).getContentsKey() == 2){
-
-				xPosPlayer -= moveUnit;
-				movementTime = 0;
-				mapContentsPositions.remove(positionKey);
-				keyCount--;
-
-			}
-			//checks for a block that can be moved in all directions or left
-			else if(mapContentsPositions.containsKey(positionKey) &&
-					(mapContentsPositions.get(positionKey).getContentsKey() == 3 ||
-					 mapContentsPositions.get(positionKey).getContentsKey() == 6)){
-				if(xPosPlayer > 64 &&
-						checkForMovableBlockCollision((int)xPosPlayer, (int) yPosPlayer, 3)) {
-					xPosPlayer -= moveUnit;
-					movementTime = 0;
-					mapContentsPositions.get(positionKey).setXPos(-32);
-				}
-			}
-			else if(mapContentsPositions.containsKey(positionKey) &&
-					mapContentsPositions.get(positionKey).getContentsKey() != 6){
-
-				xPosPlayer += 0;
-			}
-			else{
-					xPosPlayer -= moveUnit;
-					movementTime = 0;
-			}
-		}
+		    movePositionKey = stringify((int)xPosPlayer, (int)(yPosPlayer + res.TILE_SIZE));
+		    //if the boundary or a breakable block is above the player
+		    if((yPosPlayer >= winHeight - res.TILE_SIZE * 2) ||
+                    breakableWallPositions.containsKey(movePositionKey)  ){
+		        yPosPlayer += 0;
+            }
+            //if a movable block is above the player
+            else if(movableBlockPositions.containsKey(movePositionKey)){
+                String aboveMovePositionKey = stringify((int)xPosPlayer, (int)yPosPlayer + res.TILE_SIZE * 2);
+                //checks if the movable block has a movable block above it
+                //checks if the movable block is at the boundary
+                //checks if the movable block is the right move type (ALL or UP)
+                if(movableBlockPositions.containsKey(aboveMovePositionKey) ||
+                        yPosPlayer >= winHeight - res.TILE_SIZE * 3        ||
+                        (movableBlockPositions.get(movePositionKey).getContentsKey() != 3 &&
+                         movableBlockPositions.get(movePositionKey).getContentsKey() != 5)){
+                    yPosPlayer += 0;
+                }
+                else{
+                    if(breakableWallPositions.containsKey(aboveMovePositionKey)){
+                        breakableWallPositions.remove(aboveMovePositionKey);
+                        movableBlockPositions.get(movePositionKey).setYPos((int)moveUnit);
+                        yPosPlayer += moveUnit;
+                        movementTime = 0;
+                    }
+                    else{
+                        movableBlockPositions.get(movePositionKey).setYPos((int)moveUnit);
+                        yPosPlayer += moveUnit;
+                        movementTime = 0;
+                    }
+                }
+            }
+            else{
+		        yPosPlayer += moveUnit;
+		        movementTime = 0;
+            }
+            if(keyPositions.containsKey(movePositionKey)){
+                keyPositions.remove(movePositionKey);
+                keyCount--;
+                levelScore += 500;
+            }
+        }
+        else if(Gdx.input.isKeyPressed(Input.Keys.S) && move){
+            movePositionKey = stringify((int)xPosPlayer, (int)(yPosPlayer - res.TILE_SIZE));
+            //if the boundary or a breakable block is above the player
+            if((yPosPlayer <= res.TILE_SIZE) ||
+                    breakableWallPositions.containsKey(movePositionKey)  ){
+                yPosPlayer -= 0;
+            }
+            //if a movable block is below the player
+            else if(movableBlockPositions.containsKey(movePositionKey)){
+                String belowMovePositionKey = stringify((int)xPosPlayer, (int)yPosPlayer - res.TILE_SIZE * 2);
+                //checks if the movable block has a movable block below it
+                //checks if the movable block is at the boundary
+                //checks if the movable block is the right move type (ALL or DOWN)
+                if(movableBlockPositions.containsKey(belowMovePositionKey) ||
+                        yPosPlayer <= res.TILE_SIZE * 2 ||
+                        (movableBlockPositions.get(movePositionKey).getContentsKey() != 3 &&
+                                movableBlockPositions.get(movePositionKey).getContentsKey() != 4)){
+                    yPosPlayer -= 0;
+                }
+                else{
+                    if(breakableWallPositions.containsKey(belowMovePositionKey)){
+                        breakableWallPositions.remove(belowMovePositionKey);
+                        movableBlockPositions.get(movePositionKey).setYPos((int)-moveUnit);
+                        yPosPlayer -= moveUnit;
+                        movementTime = 0;
+                    }
+                    else{
+                        movableBlockPositions.get(movePositionKey).setYPos((int)-moveUnit);
+                        yPosPlayer -= moveUnit;
+                        movementTime = 0;
+                    }
+                }
+            }
+            else{
+                yPosPlayer -= moveUnit;
+                movementTime = 0;
+            }
+            if(keyPositions.containsKey(movePositionKey)){
+                keyPositions.remove(movePositionKey);
+                keyCount--;
+                levelScore += 500;
+            }
+        }
+        else if(Gdx.input.isKeyPressed(Input.Keys.D) && move){
+            movePositionKey = stringify((int)xPosPlayer  + res.TILE_SIZE, (int)(yPosPlayer));
+            //if the boundary or a breakable block is to the right of the player
+            if((xPosPlayer >= winWidth - res.TILE_SIZE * 2) ||
+                    breakableWallPositions.containsKey(movePositionKey)  ){
+                xPosPlayer += 0;
+            }
+            //if a movable block is to the right of the player
+            else if(movableBlockPositions.containsKey(movePositionKey)){
+                String rightOfMovePositionKey = stringify((int)xPosPlayer  + res.TILE_SIZE * 2, (int)yPosPlayer);
+                //checks if the movable block has a movable block to the right of it
+                //checks if the movable block is at the boundary
+                //checks if the movable block is the right move type (ALL or Right)
+                if(movableBlockPositions.containsKey(rightOfMovePositionKey) ||
+                        xPosPlayer >= winWidth - res.TILE_SIZE * 3        ||
+                        (movableBlockPositions.get(movePositionKey).getContentsKey() != 3 &&
+                                movableBlockPositions.get(movePositionKey).getContentsKey() != 7)){
+                    xPosPlayer += 0;
+                }
+                else{
+                    if(breakableWallPositions.containsKey(rightOfMovePositionKey)){
+                        breakableWallPositions.remove(rightOfMovePositionKey);
+                        movableBlockPositions.get(movePositionKey).setXPos((int)moveUnit);
+                        xPosPlayer += moveUnit;
+                        movementTime = 0;
+                    }
+                    else{
+                        movableBlockPositions.get(movePositionKey).setXPos((int)moveUnit);
+                        xPosPlayer += moveUnit;
+                        movementTime = 0;
+                    }
+                }
+            }
+            else{
+                xPosPlayer += moveUnit;
+                movementTime = 0;
+            }
+            if(keyPositions.containsKey(movePositionKey)){
+                keyPositions.remove(movePositionKey);
+                keyCount--;
+                levelScore += 500;
+            }
+        }
+        else if(Gdx.input.isKeyPressed(Input.Keys.A) && move){
+            movePositionKey = stringify((int)xPosPlayer  - res.TILE_SIZE, (int)(yPosPlayer));
+            //if the boundary or a breakable block is to the right of the player
+            if((xPosPlayer <= res.TILE_SIZE) ||
+                    breakableWallPositions.containsKey(movePositionKey)  ){
+                xPosPlayer += 0;
+            }
+            //if a movable block is to the right of the player
+            else if(movableBlockPositions.containsKey(movePositionKey)){
+                String rightOfMovePositionKey = stringify((int)xPosPlayer  - res.TILE_SIZE * 2, (int)yPosPlayer);
+                //checks if the movable block has a movable block to the right of it
+                //checks if the movable block is at the boundary
+                //checks if the movable block is the right move type (ALL or Right)
+                if(movableBlockPositions.containsKey(rightOfMovePositionKey) ||
+                        xPosPlayer <= res.TILE_SIZE * 2        ||
+                        (movableBlockPositions.get(movePositionKey).getContentsKey() != 3 &&
+                                movableBlockPositions.get(movePositionKey).getContentsKey() != 6)){
+                    xPosPlayer += 0;
+                }
+                else{
+                    if(breakableWallPositions.containsKey(rightOfMovePositionKey)){
+                        breakableWallPositions.remove(rightOfMovePositionKey);
+                        movableBlockPositions.get(movePositionKey).setXPos((int)-moveUnit);
+                        xPosPlayer -= moveUnit;
+                        movementTime = 0;
+                    }
+                    else{
+                        movableBlockPositions.get(movePositionKey).setXPos((int)-moveUnit);
+                        xPosPlayer -= moveUnit;
+                        movementTime = 0;
+                    }
+                }
+            }
+            else{
+                xPosPlayer -= moveUnit;
+                movementTime = 0;
+            }
+            if(keyPositions.containsKey(movePositionKey)){
+                keyPositions.remove(movePositionKey);
+                keyCount--;
+                levelScore += 500;
+            }
+        }
 		playerCharacter.setPosition(xPosPlayer,yPosPlayer);
 		playerCharacter.draw(batch);
 	}
@@ -334,6 +342,9 @@ public class WizardEscape extends Game {
 			batch.draw(exitDoor.getSprite(), exitDoor.getXPos(), exitDoor.getYPos());
 		}
 	}
+	private void renderScore(){
+	    font.draw(batch, "Score: " + Integer.toString((int)(levelScore * gameTime * 0.1f)), 275, 465);
+    }
 
 	@Override
 	public void create () {
@@ -356,6 +367,7 @@ public class WizardEscape extends Game {
 		movementTime = 0.0f;
 		timeCounter = 0.0f;
 		keyCount = 5;
+		levelScore = 0;
 	}
 	@Override
 	public void render () {
@@ -370,6 +382,7 @@ public class WizardEscape extends Game {
 			renderPlayerCharacter(elapsedTime);
 			renderTime(elapsedTime);
 			renderKeyCount();
+			renderScore();
 		batch.end();
 	}
 	@Override
@@ -381,39 +394,39 @@ public class WizardEscape extends Game {
 	}
 
 	private boolean checkForMovableBlockCollision(int xPosPlayer, int yPosPlayer, int directionKey){
-		String positionKey;
+		String movePositionKey;
 		//up
 		if(directionKey == 0){
-			positionKey = stringify(xPosPlayer, yPosPlayer + 64);
-			if(!mapContentsPositions.containsKey(positionKey))
+			movePositionKey = stringify(xPosPlayer, yPosPlayer + 64);
+			if(!mapContentsPositions.containsKey(movePositionKey))
 				return true;
-			return (mapContentsPositions.get(positionKey).getContentsKey() < 3 ||
-				    mapContentsPositions.get(positionKey).getContentsKey() > 7);
+			return (mapContentsPositions.get(movePositionKey).getContentsKey() < 3 ||
+				    mapContentsPositions.get(movePositionKey).getContentsKey() > 7);
 		}
 		//down
 		else if(directionKey == 1){
-			positionKey = stringify(xPosPlayer, yPosPlayer - 64);
-			if(!mapContentsPositions.containsKey(positionKey))
+			movePositionKey = stringify(xPosPlayer, yPosPlayer - 64);
+			if(!mapContentsPositions.containsKey(movePositionKey))
 				return true;
-			return ((mapContentsPositions.get(positionKey).getContentsKey() < 3) ||
-					(mapContentsPositions.get(positionKey).getContentsKey() > 7));
+			return ((mapContentsPositions.get(movePositionKey).getContentsKey() < 3) ||
+					(mapContentsPositions.get(movePositionKey).getContentsKey() > 7));
 		}
 		//right
 		else if(directionKey == 2){
-			positionKey = stringify(xPosPlayer + 64, yPosPlayer);
-			if(!mapContentsPositions.containsKey(positionKey))
+			movePositionKey = stringify(xPosPlayer + 64, yPosPlayer);
+			if(!mapContentsPositions.containsKey(movePositionKey))
 				return true;
-			return ((mapContentsPositions.get(positionKey).getContentsKey() < 3) ||
-					(mapContentsPositions.get(positionKey).getContentsKey() > 7));
+			return ((mapContentsPositions.get(movePositionKey).getContentsKey() < 3) ||
+					(mapContentsPositions.get(movePositionKey).getContentsKey() > 7));
 
 		}
 		//left
 		else{
-			positionKey = stringify(xPosPlayer - 64, yPosPlayer);
-			if(!mapContentsPositions.containsKey(positionKey))
+			movePositionKey = stringify(xPosPlayer - 64, yPosPlayer);
+			if(!mapContentsPositions.containsKey(movePositionKey))
 				return true;
-			return ((mapContentsPositions.get(positionKey).getContentsKey() < 3) ||
-					(mapContentsPositions.get(positionKey).getContentsKey() > 7));
+			return ((mapContentsPositions.get(movePositionKey).getContentsKey() < 3) ||
+					(mapContentsPositions.get(movePositionKey).getContentsKey() > 7));
 
 		}
 	}
