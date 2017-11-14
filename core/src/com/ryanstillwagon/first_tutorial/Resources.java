@@ -3,6 +3,8 @@ package com.ryanstillwagon.first_tutorial;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 
 public class Resources {
 
@@ -20,6 +22,7 @@ public class Resources {
     public TextureRegion movableBlockDownTexture;
     public TextureRegion movableBlockLeftTexture;
     public TextureRegion movableBlockRightTexture;
+    public TiledMap level;
 
     public Resources(){
         gameTextures = new TextureAtlas(Gdx.files.internal("packed/game.atlas"));
@@ -35,9 +38,12 @@ public class Resources {
         movableBlockDownTexture = gameTextures.findRegion("block_only_down");
         movableBlockLeftTexture = gameTextures.findRegion("block_only_left");
         movableBlockRightTexture = gameTextures.findRegion("block_only_right");
+
+        level = new TmxMapLoader().load("sample_background.tmx");
     }
 
     public void dispose(){
         gameTextures.dispose();
+        level.dispose();
     }
 }

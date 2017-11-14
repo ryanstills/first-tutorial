@@ -1,0 +1,83 @@
+
+game.png
+size: 1024,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+block_any_direction
+  rotate: false
+  xy: 644, 450
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+block_only_down
+  rotate: false
+  xy: 644, 416
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+block_only_left
+  rotate: false
+  xy: 678, 450
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+block_only_right
+  rotate: false
+  xy: 644, 382
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+block_only_up
+  rotate: false
+  xy: 678, 416
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+breakable_wall_green
+  rotate: false
+  xy: 712, 450
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+castledoors
+  rotate: false
+  xy: 644, 348
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+key
+  rotate: false
+  xy: 678, 382
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+map grid layout
+  rotate: false
+  xy: 2, 2
+  size: 640, 480
+  orig: 640, 480
+  offset: 0, 0
+  index: -1
+master_key
+  rotate: false
+  xy: 712, 416
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+placeholder_character
+  rotate: false
+  xy: 746, 450
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1

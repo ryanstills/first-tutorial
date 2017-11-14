@@ -41,7 +41,6 @@ public class WizardEscape extends Game {
 	private OrthographicCamera camera;
 	private Resources res;
 	private TextureRegion[] contentsTextures;
-	private TiledMap level;
 	private TiledMapRenderer levelRenderer;
 	private BitmapFont font;
 	private static float xPosPlayer;
@@ -60,9 +59,8 @@ public class WizardEscape extends Game {
 	private MapsManager mapsManager;
 
 	private void loadTextures(){
-		level = new TmxMapLoader().load("sample_background.tmx");
 
-		levelRenderer = new OrthogonalTiledMapRenderer(level);
+		levelRenderer = new OrthogonalTiledMapRenderer(res.level);
 		playerCharacter = new Sprite(res.playerTexture);
 
 		contentsTextures[1] = res.breakableWallTexture;
@@ -110,9 +108,6 @@ public class WizardEscape extends Game {
 		levelRenderer.render();
 	}
 	private void renderMap(){
-//		for(MapContents content : mapContentsPositions.values()){
-//			batch.draw(content.getSprite(), content.getXPos(), content.getYPos());
-//		}
         for(MapContents content : breakableWallPositions.values()){
             batch.draw(content.getSprite(), content.getXPos(), content.getYPos());
         }
@@ -153,6 +148,7 @@ public class WizardEscape extends Game {
                         movableBlockPositions.get(movePositionKey).setYPos((int)moveUnit);
                         yPosPlayer += moveUnit;
                         movementTime = 0;
+                        levelScore += 100;
                     }
                     else{
                         movableBlockPositions.get(movePositionKey).setYPos((int)moveUnit);
@@ -197,6 +193,7 @@ public class WizardEscape extends Game {
                         movableBlockPositions.get(movePositionKey).setYPos((int)-moveUnit);
                         yPosPlayer -= moveUnit;
                         movementTime = 0;
+                        levelScore += 100;
                     }
                     else{
                         movableBlockPositions.get(movePositionKey).setYPos((int)-moveUnit);
@@ -241,6 +238,7 @@ public class WizardEscape extends Game {
                         movableBlockPositions.get(movePositionKey).setXPos((int)moveUnit);
                         xPosPlayer += moveUnit;
                         movementTime = 0;
+                        levelScore += 100;
                     }
                     else{
                         movableBlockPositions.get(movePositionKey).setXPos((int)moveUnit);
@@ -261,7 +259,7 @@ public class WizardEscape extends Game {
         }
         else if(Gdx.input.isKeyPressed(Input.Keys.A) && move){
             movePositionKey = stringify((int)xPosPlayer  - res.TILE_SIZE, (int)(yPosPlayer));
-            //if the boundary or a breakable block is to the right of the player
+            //if the boundary or a breakable block is to the left of the player
             if((xPosPlayer <= res.TILE_SIZE) ||
                     breakableWallPositions.containsKey(movePositionKey) &&
                     !keyPositions.containsKey(movePositionKey)){
@@ -270,9 +268,9 @@ public class WizardEscape extends Game {
             //if a movable block is to the right of the player
             else if(movableBlockPositions.containsKey(movePositionKey)){
                 String rightOfMovePositionKey = stringify((int)xPosPlayer  - res.TILE_SIZE * 2, (int)yPosPlayer);
-                //checks if the movable block has a movable block to the right of it
+                //checks if the movable block has a movable block to the left of it
                 //checks if the movable block is at the boundary
-                //checks if the movable block is the right move type (ALL or Right)
+                //checks if the movable block is the right move type (ALL or Left)
                 if(movableBlockPositions.containsKey(rightOfMovePositionKey) ||
                         xPosPlayer <= res.TILE_SIZE * 2        ||
                         (movableBlockPositions.get(movePositionKey).getContentsKey() != 3 &&
@@ -285,6 +283,7 @@ public class WizardEscape extends Game {
                         movableBlockPositions.get(movePositionKey).setXPos((int)-moveUnit);
                         xPosPlayer -= moveUnit;
                         movementTime = 0;
+                        levelScore += 100;
                     }
                     else{
                         movableBlockPositions.get(movePositionKey).setXPos((int)-moveUnit);
@@ -349,7 +348,7 @@ public class WizardEscape extends Game {
         }
 	}
 	private void renderScore(){
-	    font.draw(batch, "Score: " + Integer.toString((int)(levelScore * gameTime * 0.1f)), 275, 465);
+	    font.draw(batch, "Score: " + Integer.toString(levelScore), 275, 465);
     }
 
 	@Override
@@ -395,7 +394,6 @@ public class WizardEscape extends Game {
 	public void dispose () {
 		batch.dispose();
 		res.dispose();
-		level.dispose();
 		font.dispose();
 	}
 	private String stringify(int xPos, int yPos){
