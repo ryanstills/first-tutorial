@@ -8,9 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.ryanstillwagon.first_tutorial.managers.MapsManager;
 
@@ -76,7 +74,7 @@ public class WizardEscape extends Game {
 		int xPos = 32;
 		int yPos = 32;
 		int positionCount = 0;
-		int level = 1;
+		int level = 2;
 		int[] map = mapsManager.getMap(level);
 
 		for(int i = 0; i < map.length; i++){
